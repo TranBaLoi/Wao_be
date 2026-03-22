@@ -50,6 +50,24 @@ public class FoodLogService {
         foodLogRepository.deleteById(logId);
     }
 
+    public List<FoodLogDto.Response> getByMealType(UserFoodLog.MealType mealType) {
+        return foodLogRepository.findByMealType(mealType)
+                .stream().map(this::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<FoodLogDto.Response> getByUserDateAndMealType(
+            Long userId,
+            LocalDate date,
+            UserFoodLog.MealType mealType
+    ){
+        return foodLogRepository.findByUserIdAndLogDateAndMealType(userId, date, mealType)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+
     private FoodLogDto.Response toResponse(UserFoodLog l) {
         FoodLogDto.Response r = new FoodLogDto.Response();
         r.setId(l.getId());
@@ -62,5 +80,6 @@ public class FoodLogService {
         r.setLogDate(l.getLogDate());
         return r;
     }
+
 }
 

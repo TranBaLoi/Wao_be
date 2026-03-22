@@ -19,5 +19,15 @@ public interface UserFoodLogRepository extends JpaRepository<UserFoodLog, Long> 
     @Query("SELECT COALESCE(SUM(f.totalCalories), 0) FROM UserFoodLog f " +
            "WHERE f.user.id = :userId AND f.logDate = :date")
     Double sumCaloriesByUserIdAndLogDate(@Param("userId") Long userId, @Param("date") LocalDate date);
+
+    List<UserFoodLog> findByMealType(UserFoodLog.MealType mealType);
+
+    List<UserFoodLog> findByUserIdAndLogDateAndMealType(
+            Long userId,
+            LocalDate logDate,
+            UserFoodLog.MealType mealType
+    );
+
+    void deleteByUserIdAndLogDate(Long userId, LocalDate logDate);
 }
 

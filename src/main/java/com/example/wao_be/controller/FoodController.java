@@ -31,15 +31,15 @@ public class FoodController {
                 .body(foodService.create(req, true));
     }
 
-    /** GET /api/foods?name= */
-    @GetMapping
+    /** GET /api/foods/search?name= */
+    @GetMapping("/search")
     public ResponseEntity<List<FoodDto.Response>> search(
             @RequestParam(required = false) String name) {
         return ResponseEntity.ok(foodService.search(name));
     }
 
     /** GET /api/foods/{id} */
-    @GetMapping("/{id}")
+    @GetMapping("/search/{id}")
     public ResponseEntity<FoodDto.Response> getById(@PathVariable Long id) {
         return ResponseEntity.ok(foodService.getById(id));
     }

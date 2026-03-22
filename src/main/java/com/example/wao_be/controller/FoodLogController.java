@@ -1,6 +1,7 @@
 package com.example.wao_be.controller;
 
 import com.example.wao_be.dto.FoodLogDto;
+import com.example.wao_be.entity.UserFoodLog;
 import com.example.wao_be.service.DailySummaryService;
 import com.example.wao_be.service.FoodLogService;
 import jakarta.validation.Valid;
@@ -33,11 +34,26 @@ public class FoodLogController {
     }
 
     /** GET /api/users/{userId}/food-logs?date=yyyy-MM-dd */
-    @GetMapping
+    @GetMapping("/by-date")
     public ResponseEntity<List<FoodLogDto.Response>> getByDate(
             @PathVariable Long userId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return ResponseEntity.ok(foodLogService.getByUserAndDate(userId, date));
+    }
+
+    @GetMapping("/by-meal-type")
+    public ResponseEntity<List<FoodLogDto.Response>> getByMealType(
+            @RequestParam UserFoodLog.MealType mealType) {
+        return ResponseEntity.ok(foodLogService.getByMealType(mealType));
+    }
+
+    @GetMapping("/by-date-and-meal-type")
+    public ResponseEntity<List<FoodLogDto.Response>> getByDateAndMealType(
+            @PathVariable Long userId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam UserFoodLog.MealType mealType) {
+
+            return ResponseEntity.ok(foodLogService.getByUserDateAndMealType(userId, date, mealType));
     }
 
     /** DELETE /api/users/{userId}/food-logs/{logId} */
