@@ -72,5 +72,12 @@ public class MealPlanController {
         mealPlanService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{mealPlanId}/apply")
+    public ResponseEntity<MealPlanDto.ApplyResponse> applyToDate(
+            @PathVariable Long mealPlanId,
+            @Valid @RequestBody MealPlanDto.ApplyRequest req) {
+        return ResponseEntity.ok(mealPlanService.applyToDate(mealPlanId, req));
+    }
 }
 

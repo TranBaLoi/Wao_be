@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class MealPlanDto {
@@ -61,5 +62,25 @@ public class MealPlanDto {
             private Double calories;
         }
     }
+
+    @Data
+    public static class ApplyRequest {
+        @NotNull
+        private Long userId;
+
+        @NotNull
+        private LocalDate logDate;
+    }
+
+    @Data
+    public static class ApplyResponse {
+        private Long mealPlanId;
+        private Long userId;
+        private LocalDate logDate;
+        private Integer previousItems;
+        private Integer addedItems;
+        private String message;
+    }
+
 }
 

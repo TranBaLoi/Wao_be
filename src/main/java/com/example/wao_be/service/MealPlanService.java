@@ -1,16 +1,15 @@
 package com.example.wao_be.service;
 
 import com.example.wao_be.dto.MealPlanDto;
-import com.example.wao_be.entity.Food;
-import com.example.wao_be.entity.MealPlan;
-import com.example.wao_be.entity.MealPlanFood;
-import com.example.wao_be.entity.User;
+import com.example.wao_be.entity.*;
 import com.example.wao_be.repository.MealPlanRepository;
+import com.example.wao_be.repository.UserFoodLogRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +21,9 @@ public class MealPlanService {
     private final MealPlanRepository mealPlanRepository;
     private final UserService userService;
     private final FoodService foodService;
+
+    private final UserFoodLogRepository userFoodLogRepository;
+    private final DailySummaryService dailySummaryService;
 
     /** Tạo meal plan (system hoặc user custom) */
     public MealPlanDto.Response create(MealPlanDto.Request req) {
@@ -98,6 +100,51 @@ public class MealPlanService {
         return mealPlanRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("MealPlan not found: " + id));
     }
+
+    public MealPlanDto.ApplyResponse applyToDate(Long mealPlanId, MealPlanDto.ApplyRequest req) {
+        MealPlan mealPlan = findById(mealPlanId);
+        User user = userService.findById(req.getUserId());
+        LocalDate logDate = req.getLogDate();
+
+        if (mealPlan.getType() == MealPlan.MealPlanType.USER_CUSTOM) {
+            if (mealPlan.getUser() == null || !mealPlan.getUser().getId().equals(user.getId())) {
+                throw new IllegalArgumentException("You can only apply your own USER_CUSTOM meal plan.");
+            }
+        }
+
+        int previousCount = userFoodLogRepository.findByUserIdAndLogDate(user.getId(), logDate).size();
+
+        userFoodLogRepository.deleteByUserIdAndLogDate(user.getId(), logDate);
+
+        if (mealPlan.getMealPlanFoods() == null || mealPlan.getMealPlanFoods().isEmpty()) {
+            throw new IllegalArgumentException("Meal plan has no food items to apply.");
+        }
+
+        var logs = mealPlan.getMealPlanFoods().stream()
+                .map(item -> UserFoodLog.builder()
+                        .user(user)
+                        .food(item.getFood())
+                        .mealType(item.getMealType())
+                        .servingQty(item.getServingQty())
+                        .totalCalories(0.0)
+                        .logDate(logDate)
+                        .build())
+                .toList();
+
+        userFoodLogRepository.saveAll(logs);
+        dailySummaryService.buildAndSave(user.getId(), logDate);
+
+        MealPlanDto.ApplyResponse res = new MealPlanDto.ApplyResponse();
+        res.setMealPlanId(mealPlanId);
+        res.setUserId(user.getId());
+        res.setLogDate(logDate);
+        res.setPreviousItems(previousCount);
+        res.setAddedItems(logs.size());
+        res.setMessage("Applied meal plan successfully.");
+        return res;
+    }
+
+
 
     // ---- Mapper ----
     private MealPlanDto.Response toResponse(MealPlan mp) {
