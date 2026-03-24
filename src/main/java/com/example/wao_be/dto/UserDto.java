@@ -32,6 +32,7 @@ public class UserDto {
         private String email;
         private String fullName;
         private User.UserStatus status;
+        // Avatar image URL
+        private String img;
     }
 }
-
