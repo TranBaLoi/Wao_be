@@ -202,8 +202,8 @@ server.port=8080
 | User | `POST /api/users/register`, `POST /api/users/login` |
 | Health Profile | `/api/health-profiles` |
 | Food | `/api/foods` |
+| Food Image | `/api/food-images` |
 | Food Log | `/api/food-logs` |
-| Meal Plan | `/api/meal-plans` |
 | Exercise | `/api/exercises` |
 | Workout Program | `/api/workout-programs` |
 | Workout Log | `/api/workout-logs` |
@@ -213,15 +213,9 @@ server.port=8080
 
 > 📌 Tất cả API đều hỗ trợ các phương thức: `GET`, `POST`, `PUT`, `DELETE`
 
----
+### Food form + image upload
 
-## 🐛 Xử lý lỗi thường gặp
-
-### Lỗi kết nối Database
-```
-Communications link failure
-```
-→ Kiểm tra MySQL đang chạy và đúng cổng trong `application.properties`
+- Tạo món ăn bằng form + ảnh: `POST /api/foods/form` (`multipart/form-data`)
 
 ### Lỗi Access Denied
 ```

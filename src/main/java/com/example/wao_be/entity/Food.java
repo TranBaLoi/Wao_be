@@ -3,6 +3,7 @@ package com.example.wao_be.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -52,5 +53,9 @@ public class Food {
     /** Danh sách meal plan chứa món ăn này */
     @OneToMany(mappedBy = "food", cascade = CascadeType.ALL)
     private List<MealPlanFood> mealPlanFoods;
+
+    @OneToMany(mappedBy = "food", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<FoodImage> images = new ArrayList<>();
 }
 
