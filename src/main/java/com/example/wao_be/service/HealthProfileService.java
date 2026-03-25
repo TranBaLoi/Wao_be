@@ -1,15 +1,20 @@
+// phan cua nam
 package com.example.wao_be.service;
 
 import com.example.wao_be.dto.HealthProfileDto;
 import com.example.wao_be.entity.User;
 import com.example.wao_be.entity.UserHealthProfile;
+import com.example.wao_be.entity.WeightLog;
 import com.example.wao_be.repository.UserHealthProfileRepository;
+import com.example.wao_be.repository.WeightLogRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,10 +22,13 @@ import java.util.List;
 public class HealthProfileService {
 
     private final UserHealthProfileRepository profileRepository;
+    private final WeightLogRepository weightLogRepository;
     private final UserService userService;
 
     public HealthProfileDto.Response create(Long userId, HealthProfileDto.Request req) {
         User user = userService.findById(userId);
+        Optional<UserHealthProfile> latestProfile = profileRepository.findFirstByUserIdOrderByRecordedAtDesc(userId);
+
         UserHealthProfile profile = UserHealthProfile.builder()
                 .user(user)
                 .gender(req.getGender())
@@ -30,8 +38,10 @@ public class HealthProfileService {
                 .activityLevel(req.getActivityLevel())
                 .goalType(req.getGoalType())
                 .build();
-        // targetCalories sẽ tự được tính trong @PrePersist
-        return toResponse(profileRepository.save(profile));
+
+        UserHealthProfile savedProfile = profileRepository.save(profile);
+        saveWeightLogIfNeeded(user, latestProfile.orElse(null), savedProfile);
+        return toResponse(savedProfile);
     }
 
     @Transactional(readOnly = true)
@@ -44,7 +54,9 @@ public class HealthProfileService {
     @Transactional(readOnly = true)
     public List<HealthProfileDto.Response> getHistory(Long userId) {
         return profileRepository.findByUserIdOrderByRecordedAtDesc(userId)
-                .stream().map(this::toResponse).toList();
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     private HealthProfileDto.Response toResponse(UserHealthProfile p) {
@@ -60,5 +72,25 @@ public class HealthProfileService {
         r.setTargetCalories(p.getTargetCalories());
         return r;
     }
-}
 
+    private void saveWeightLogIfNeeded(User user, UserHealthProfile previousProfile, UserHealthProfile currentProfile) {
+        Double newWeight = currentProfile.getWeightKg();
+        if (newWeight == null) {
+            return;
+        }
+
+        Double previousWeight = previousProfile != null ? previousProfile.getWeightKg() : null;
+        if (previousWeight != null && Objects.equals(previousWeight, newWeight)) {
+            return;
+        }
+
+        WeightLog weightLog = WeightLog.builder()
+                .user(user)
+                .oldWeight(previousWeight != null ? previousWeight : newWeight)
+                .newWeight(newWeight)
+                .note(previousWeight == null ? "Initial weight record" : "Weight updated from health profile")
+                .build();
+
+        weightLogRepository.save(weightLog);
+    }
+}
