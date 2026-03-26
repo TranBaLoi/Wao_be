@@ -1,0 +1,906 @@
+[
+  {
+    "name": "Cơm gà luộc",
+    "servingSize": "1 phần (300g)",
+    "calories": 450,
+    "protein": 35,
+    "carbs": 50,
+    "fat": 10,
+    "ingredients": ["gạo", "ức gà", "muối", "gừng"]
+  },
+  {
+    "name": "Phở bò",
+    "servingSize": "1 tô (500g)",
+    "calories": 550,
+    "protein": 30,
+    "carbs": 70,
+    "fat": 15,
+    "ingredients": ["bánh phở", "thịt bò", "hành", "gừng", "quế", "nước dùng"]
+  },
+  {
+    "name": "Bún chả",
+    "servingSize": "1 phần (400g)",
+    "calories": 600,
+    "protein": 28,
+    "carbs": 65,
+    "fat": 25,
+    "ingredients": ["bún", "thịt heo", "nước mắm", "tỏi", "đường", "rau sống"]
+  },
+  {
+    "name": "Cơm tấm sườn",
+    "servingSize": "1 phần (350g)",
+    "calories": 700,
+    "protein": 32,
+    "carbs": 80,
+    "fat": 28,
+    "ingredients": ["gạo tấm", "sườn heo", "trứng", "nước mắm", "dưa leo"]
+  },
+  {
+    "name": "Bánh mì thịt",
+    "servingSize": "1 ổ (250g)",
+    "calories": 480,
+    "protein": 20,
+    "carbs": 55,
+    "fat": 18,
+    "ingredients": ["bánh mì", "thịt nguội", "pate", "dưa leo", "rau mùi"]
+  },
+  {
+    "name": "Salad ức gà",
+    "servingSize": "1 phần (200g)",
+    "calories": 300,
+    "protein": 35,
+    "carbs": 10,
+    "fat": 12,
+    "ingredients": ["ức gà", "xà lách", "cà chua", "dầu olive", "muối"]
+  },
+  {
+    "name": "Trứng ốp la",
+    "servingSize": "2 quả",
+    "calories": 180,
+    "protein": 12,
+    "carbs": 1,
+    "fat": 14,
+    "ingredients": ["trứng gà", "dầu ăn", "muối"]
+  },
+  {
+    "name": "Cá hồi áp chảo",
+    "servingSize": "1 phần (200g)",
+    "calories": 400,
+    "protein": 34,
+    "carbs": 0,
+    "fat": 28,
+    "ingredients": ["cá hồi", "muối", "tiêu", "bơ"]
+  },
+  {
+    "name": "Mì xào bò",
+    "servingSize": "1 phần (350g)",
+    "calories": 650,
+    "protein": 25,
+    "carbs": 80,
+    "fat": 22,
+    "ingredients": ["mì", "thịt bò", "cải", "tỏi", "dầu ăn"]
+  },
+  {
+    "name": "Bún bò Huế",
+    "servingSize": "1 tô (500g)",
+    "calories": 620,
+    "protein": 35,
+    "carbs": 75,
+    "fat": 20,
+    "ingredients": ["bún", "thịt bò", "giò heo", "ớt", "sả"]
+  },
+  {
+    "name": "Cơm chiên trứng",
+    "servingSize": "1 phần (300g)",
+    "calories": 500,
+    "protein": 18,
+    "carbs": 65,
+    "fat": 20,
+    "ingredients": ["gạo", "trứng", "hành lá", "nước mắm"]
+  },
+  {
+    "name": "Cháo gà",
+    "servingSize": "1 tô (400g)",
+    "calories": 350,
+    "protein": 25,
+    "carbs": 40,
+    "fat": 8,
+    "ingredients": ["gạo", "ức gà", "hành", "gừng"]
+  },
+  {
+    "name": "Bánh xèo",
+    "servingSize": "1 cái (300g)",
+    "calories": 550,
+    "protein": 20,
+    "carbs": 60,
+    "fat": 25,
+    "ingredients": ["bột gạo", "tôm", "thịt heo", "giá", "nước mắm"]
+  },
+  {
+    "name": "Gỏi cuốn",
+    "servingSize": "2 cuốn",
+    "calories": 200,
+    "protein": 12,
+    "carbs": 25,
+    "fat": 5,
+    "ingredients": ["bánh tráng", "tôm", "thịt", "bún", "rau"]
+  },
+  {
+    "name": "Canh chua cá",
+    "servingSize": "1 tô (300g)",
+    "calories": 250,
+    "protein": 20,
+    "carbs": 15,
+    "fat": 10,
+    "ingredients": ["cá", "cà chua", "me", "dứa", "rau thơm"]
+  },
+  {
+    "name": "Thịt kho trứng",
+    "servingSize": "1 phần (250g)",
+    "calories": 600,
+    "protein": 30,
+    "carbs": 20,
+    "fat": 40,
+    "ingredients": ["thịt ba chỉ", "trứng", "nước mắm", "đường"]
+  },
+  {
+    "name": "Đậu hũ chiên",
+    "servingSize": "1 phần (200g)",
+    "calories": 300,
+    "protein": 18,
+    "carbs": 10,
+    "fat": 20,
+    "ingredients": ["đậu hũ", "dầu ăn", "muối"]
+  },
+  {
+    "name": "Cơm bò lúc lắc",
+    "servingSize": "1 phần (350g)",
+    "calories": 650,
+    "protein": 35,
+    "carbs": 70,
+    "fat": 25,
+    "ingredients": ["thịt bò", "gạo", "ớt chuông", "tỏi"]
+  },
+  {
+    "name": "Mì Ý sốt bò",
+    "servingSize": "1 phần (350g)",
+    "calories": 700,
+    "protein": 30,
+    "carbs": 90,
+    "fat": 22,
+    "ingredients": ["mì spaghetti", "thịt bò", "cà chua", "hành tây"]
+  },
+  {
+    "name": "Hamburger bò",
+    "servingSize": "1 cái (250g)",
+    "calories": 550,
+    "protein": 28,
+    "carbs": 45,
+    "fat": 30,
+    "ingredients": ["bánh mì", "thịt bò", "phô mai", "xà lách"]
+  },
+  {
+    "name": "Pizza hải sản",
+    "servingSize": "1 miếng (200g)",
+    "calories": 500,
+    "protein": 22,
+    "carbs": 60,
+    "fat": 20,
+    "ingredients": ["bột mì", "tôm", "mực", "phô mai", "sốt cà chua"]
+  },
+  {
+    "name": "Sushi cá hồi",
+    "servingSize": "6 miếng",
+    "calories": 300,
+    "protein": 20,
+    "carbs": 40,
+    "fat": 8,
+    "ingredients": ["gạo sushi", "cá hồi", "rong biển"]
+  },
+  {
+    "name": "Cơm rang dưa bò",
+    "servingSize": "1 phần (300g)",
+    "calories": 550,
+    "protein": 25,
+    "carbs": 65,
+    "fat": 20,
+    "ingredients": ["gạo", "thịt bò", "dưa chua", "hành"]
+  },
+  {
+    "name": "Bánh cuốn",
+    "servingSize": "1 phần (300g)",
+    "calories": 400,
+    "protein": 18,
+    "carbs": 60,
+    "fat": 10,
+    "ingredients": ["bột gạo", "thịt heo", "mộc nhĩ", "hành"]
+  },
+  {
+    "name": "Lẩu thái",
+    "servingSize": "1 phần (500g)",
+    "calories": 700,
+    "protein": 35,
+    "carbs": 50,
+    "fat": 35,
+    "ingredients": ["tôm", "mực", "nấm", "sả", "lá chanh", "ớt"]
+  },
+{
+    "name": "Cơm gà xối mỡ",
+    "servingSize": "1 phần (350g)",
+    "calories": 750,
+    "protein": 30,
+    "carbs": 80,
+    "fat": 35,
+    "ingredients": ["gạo", "đùi gà", "dầu ăn", "tỏi"]
+  },
+  {
+    "name": "Bánh canh cua",
+    "servingSize": "1 tô (400g)",
+    "calories": 520,
+    "protein": 28,
+    "carbs": 60,
+    "fat": 18,
+    "ingredients": ["bánh canh", "cua", "trứng", "hành"]
+  },
+  {
+    "name": "Hủ tiếu Nam Vang",
+    "servingSize": "1 tô (450g)",
+    "calories": 600,
+    "protein": 30,
+    "carbs": 70,
+    "fat": 20,
+    "ingredients": ["hủ tiếu", "thịt heo", "tôm", "trứng cút"]
+  },
+  {
+    "name": "Cơm cá kho tộ",
+    "servingSize": "1 phần (300g)",
+    "calories": 550,
+    "protein": 32,
+    "carbs": 60,
+    "fat": 18,
+    "ingredients": ["cá", "gạo", "nước mắm", "tiêu"]
+  },
+  {
+    "name": "Bánh bao nhân thịt",
+    "servingSize": "1 cái (200g)",
+    "calories": 400,
+    "protein": 15,
+    "carbs": 50,
+    "fat": 12,
+    "ingredients": ["bột mì", "thịt heo", "trứng", "nấm"]
+  },
+  {
+    "name": "Miến gà",
+    "servingSize": "1 tô (350g)",
+    "calories": 450,
+    "protein": 25,
+    "carbs": 55,
+    "fat": 12,
+    "ingredients": ["miến", "ức gà", "hành", "mộc nhĩ"]
+  },
+  {
+    "name": "Cơm sườn non nướng",
+    "servingSize": "1 phần (350g)",
+    "calories": 720,
+    "protein": 35,
+    "carbs": 75,
+    "fat": 30,
+    "ingredients": ["gạo", "sườn non", "mật ong", "tỏi"]
+  },
+  {
+    "name": "Bún riêu cua",
+    "servingSize": "1 tô (400g)",
+    "calories": 480,
+    "protein": 22,
+    "carbs": 60,
+    "fat": 15,
+    "ingredients": ["bún", "cua", "cà chua", "đậu hũ"]
+  },
+  {
+    "name": "Cơm trứng chiên",
+    "servingSize": "1 phần (250g)",
+    "calories": 420,
+    "protein": 15,
+    "carbs": 55,
+    "fat": 18,
+    "ingredients": ["gạo", "trứng", "hành"]
+  },
+  {
+    "name": "Mì ramen",
+    "servingSize": "1 tô (500g)",
+    "calories": 650,
+    "protein": 28,
+    "carbs": 75,
+    "fat": 25,
+    "ingredients": ["mì ramen", "thịt heo", "trứng", "rong biển"]
+  },
+
+  {
+    "name": "Bánh mì ốp la",
+    "servingSize": "1 phần (250g)",
+    "calories": 500,
+    "protein": 18,
+    "carbs": 55,
+    "fat": 20,
+    "ingredients": ["bánh mì", "trứng", "bơ"]
+  },
+  {
+    "name": "Cơm rang hải sản",
+    "servingSize": "1 phần (300g)",
+    "calories": 580,
+    "protein": 25,
+    "carbs": 65,
+    "fat": 20,
+    "ingredients": ["gạo", "tôm", "mực", "hành"]
+  },
+  {
+    "name": "Canh bí đỏ thịt bằm",
+    "servingSize": "1 tô (300g)",
+    "calories": 280,
+    "protein": 18,
+    "carbs": 20,
+    "fat": 12,
+    "ingredients": ["bí đỏ", "thịt bằm", "hành"]
+  },
+  {
+    "name": "Cá chiên giòn",
+    "servingSize": "1 phần (200g)",
+    "calories": 450,
+    "protein": 30,
+    "carbs": 10,
+    "fat": 30,
+    "ingredients": ["cá", "bột chiên", "dầu"]
+  },
+  {
+    "name": "Bún thịt nướng",
+    "servingSize": "1 phần (400g)",
+    "calories": 600,
+    "protein": 28,
+    "carbs": 70,
+    "fat": 22,
+    "ingredients": ["bún", "thịt nướng", "rau"]
+  },
+
+  {
+    "name": "Cháo thịt bằm",
+    "servingSize": "1 tô (350g)",
+    "calories": 320,
+    "protein": 20,
+    "carbs": 40,
+    "fat": 8,
+    "ingredients": ["gạo", "thịt bằm", "hành"]
+  },
+  {
+    "name": "Cơm cá chiên",
+    "servingSize": "1 phần (300g)",
+    "calories": 520,
+    "protein": 28,
+    "carbs": 60,
+    "fat": 18,
+    "ingredients": ["gạo", "cá", "dầu"]
+  },
+  {
+    "name": "Đậu hũ sốt cà",
+    "servingSize": "1 phần (250g)",
+    "calories": 300,
+    "protein": 18,
+    "carbs": 15,
+    "fat": 18,
+    "ingredients": ["đậu hũ", "cà chua", "hành"]
+  },
+  {
+    "name": "Thịt bò xào rau",
+    "servingSize": "1 phần (250g)",
+    "calories": 400,
+    "protein": 30,
+    "carbs": 10,
+    "fat": 25,
+    "ingredients": ["thịt bò", "rau", "tỏi"]
+  },
+  {
+    "name": "Canh rau cải",
+    "servingSize": "1 tô (200g)",
+    "calories": 120,
+    "protein": 5,
+    "carbs": 10,
+    "fat": 5,
+    "ingredients": ["rau cải", "muối"]
+  },
+
+  {
+    "name": "Gà chiên giòn",
+    "servingSize": "1 phần (300g)",
+    "calories": 700,
+    "protein": 35,
+    "carbs": 30,
+    "fat": 45,
+    "ingredients": ["gà", "bột chiên", "dầu"]
+  },
+  {
+    "name": "Mì xào trứng",
+    "servingSize": "1 phần (300g)",
+    "calories": 500,
+    "protein": 20,
+    "carbs": 65,
+    "fat": 18,
+    "ingredients": ["mì", "trứng", "hành"]
+  },
+  {
+    "name": "Cơm cá hồi",
+    "servingSize": "1 phần (300g)",
+    "calories": 600,
+    "protein": 35,
+    "carbs": 60,
+    "fat": 22,
+    "ingredients": ["cá hồi", "gạo"]
+  },
+  {
+    "name": "Bánh flan",
+    "servingSize": "1 phần (150g)",
+    "calories": 250,
+    "protein": 6,
+    "carbs": 30,
+    "fat": 10,
+    "ingredients": ["trứng", "sữa", "đường"]
+  },
+  {
+    "name": "Chè đậu xanh",
+    "servingSize": "1 chén (200g)",
+    "calories": 300,
+    "protein": 10,
+    "carbs": 50,
+    "fat": 5,
+    "ingredients": ["đậu xanh", "đường"]
+  },
+
+  {
+    "name": "Chè trôi nước",
+    "servingSize": "1 phần (250g)",
+    "calories": 350,
+    "protein": 8,
+    "carbs": 60,
+    "fat": 10,
+    "ingredients": ["bột nếp", "đậu xanh", "đường"]
+  },
+  {
+    "name": "Sữa chua trái cây",
+    "servingSize": "1 ly (200g)",
+    "calories": 220,
+    "protein": 6,
+    "carbs": 30,
+    "fat": 8,
+    "ingredients": ["sữa chua", "trái cây"]
+  },
+  {
+    "name": "Sinh tố xoài",
+    "servingSize": "1 ly (300ml)",
+    "calories": 250,
+    "protein": 4,
+    "carbs": 55,
+    "fat": 3,
+    "ingredients": ["xoài", "sữa"]
+  },
+  {
+    "name": "Sinh tố bơ",
+    "servingSize": "1 ly (300ml)",
+    "calories": 320,
+    "protein": 5,
+    "carbs": 40,
+    "fat": 15,
+    "ingredients": ["bơ", "sữa"]
+  },
+  {
+    "name": "Nước cam",
+    "servingSize": "1 ly (250ml)",
+    "calories": 120,
+    "protein": 2,
+    "carbs": 28,
+    "fat": 0,
+    "ingredients": ["cam"]
+  },
+{
+    "name": "Cơm thịt nướng",
+    "servingSize": "1 phần (350g)",
+    "calories": 680,
+    "protein": 33,
+    "carbs": 75,
+    "fat": 28,
+    "ingredients": ["gạo", "thịt heo", "mật ong", "tỏi", "sả"]
+  },
+  {
+    "name": "Bún bò nam bộ",
+    "servingSize": "1 phần (400g)",
+    "calories": 580,
+    "protein": 30,
+    "carbs": 65,
+    "fat": 20,
+    "ingredients": ["bún", "thịt bò", "đậu phộng", "rau sống", "nước mắm"]
+  },
+  {
+    "name": "Cháo vịt",
+    "servingSize": "1 tô (400g)",
+    "calories": 380,
+    "protein": 28,
+    "carbs": 42,
+    "fat": 10,
+    "ingredients": ["gạo", "thịt vịt", "gừng", "hành", "tiêu"]
+  },
+  {
+    "name": "Mì Quảng",
+    "servingSize": "1 tô (450g)",
+    "calories": 560,
+    "protein": 28,
+    "carbs": 68,
+    "fat": 18,
+    "ingredients": ["mì Quảng", "tôm", "thịt heo", "đậu phộng", "rau sống"]
+  },
+  {
+    "name": "Cơm gà Hải Nam",
+    "servingSize": "1 phần (350g)",
+    "calories": 620,
+    "protein": 34,
+    "carbs": 72,
+    "fat": 20,
+    "ingredients": ["gạo", "ức gà", "gừng", "hành", "nước dùng gà"]
+  },
+  {
+    "name": "Bánh khọt",
+    "servingSize": "6 cái (300g)",
+    "calories": 480,
+    "protein": 18,
+    "carbs": 55,
+    "fat": 22,
+    "ingredients": ["bột gạo", "tôm", "hành lá", "dầu ăn", "nước mắm"]
+  },
+  {
+    "name": "Súp gà nấm",
+    "servingSize": "1 tô (350g)",
+    "calories": 260,
+    "protein": 22,
+    "carbs": 18,
+    "fat": 8,
+    "ingredients": ["ức gà", "nấm", "hành tây", "cà rốt", "tiêu"]
+  },
+  {
+    "name": "Cơm chiên dương châu",
+    "servingSize": "1 phần (350g)",
+    "calories": 620,
+    "protein": 22,
+    "carbs": 75,
+    "fat": 24,
+    "ingredients": ["gạo", "tôm", "xúc xích", "trứng", "hành lá"]
+  },
+  {
+    "name": "Lẩu riêu cua",
+    "servingSize": "1 phần (500g)",
+    "calories": 520,
+    "protein": 30,
+    "carbs": 55,
+    "fat": 18,
+    "ingredients": ["cua", "bún", "cà chua", "đậu hũ", "rau muống"]
+  },
+  {
+    "name": "Gà nướng mật ong",
+    "servingSize": "1 phần (300g)",
+    "calories": 560,
+    "protein": 40,
+    "carbs": 20,
+    "fat": 32,
+    "ingredients": ["đùi gà", "mật ong", "tỏi", "nước mắm", "tiêu"]
+  },
+  {
+    "name": "Bún đậu mắm tôm",
+    "servingSize": "1 phần (400g)",
+    "calories": 640,
+    "protein": 30,
+    "carbs": 65,
+    "fat": 28,
+    "ingredients": ["bún", "đậu hũ", "chả cốm", "mắm tôm", "rau thơm"]
+  },
+  {
+    "name": "Cơm cuộn rong biển",
+    "servingSize": "6 cuộn (250g)",
+    "calories": 380,
+    "protein": 14,
+    "carbs": 60,
+    "fat": 8,
+    "ingredients": ["gạo sushi", "rong biển", "dưa leo", "cà rốt", "giấm gạo"]
+  },
+  {
+    "name": "Canh khổ qua nhồi thịt",
+    "servingSize": "1 tô (350g)",
+    "calories": 290,
+    "protein": 22,
+    "carbs": 14,
+    "fat": 14,
+    "ingredients": ["khổ qua", "thịt heo", "miến", "trứng", "hành"]
+  },
+  {
+    "name": "Phở gà",
+    "servingSize": "1 tô (500g)",
+    "calories": 480,
+    "protein": 32,
+    "carbs": 60,
+    "fat": 10,
+    "ingredients": ["bánh phở", "ức gà", "hành", "gừng", "nước dùng"]
+  },
+  {
+    "name": "Bánh tráng trộn",
+    "servingSize": "1 phần (200g)",
+    "calories": 350,
+    "protein": 12,
+    "carbs": 48,
+    "fat": 14,
+    "ingredients": ["bánh tráng", "tôm khô", "trứng cút", "xoài", "sa tế"]
+  },
+  {
+    "name": "Cơm chiên tôm",
+    "servingSize": "1 phần (300g)",
+    "calories": 560,
+    "protein": 24,
+    "carbs": 68,
+    "fat": 18,
+    "ingredients": ["gạo", "tôm", "trứng", "hành lá", "dầu ăn"]
+  },
+  {
+    "name": "Sườn xào chua ngọt",
+    "servingSize": "1 phần (300g)",
+    "calories": 550,
+    "protein": 28,
+    "carbs": 35,
+    "fat": 32,
+    "ingredients": ["sườn heo", "cà chua", "ớt chuông", "đường", "giấm"]
+  },
+  {
+    "name": "Cá basa chiên sốt",
+    "servingSize": "1 phần (250g)",
+    "calories": 420,
+    "protein": 32,
+    "carbs": 15,
+    "fat": 24,
+    "ingredients": ["cá basa", "tỏi", "ớt", "dầu", "nước mắm"]
+  },
+  {
+    "name": "Bánh ướt",
+    "servingSize": "1 phần (300g)",
+    "calories": 360,
+    "protein": 16,
+    "carbs": 55,
+    "fat": 8,
+    "ingredients": ["bột gạo", "chả lụa", "hành phi", "nước mắm"]
+  },
+  {
+    "name": "Gỏi ngó sen",
+    "servingSize": "1 phần (250g)",
+    "calories": 280,
+    "protein": 18,
+    "carbs": 22,
+    "fat": 12,
+    "ingredients": ["ngó sen", "tôm", "thịt heo", "đậu phộng", "rau thơm"]
+  },
+  {
+    "name": "Bún mọc",
+    "servingSize": "1 tô (450g)",
+    "calories": 500,
+    "protein": 28,
+    "carbs": 62,
+    "fat": 14,
+    "ingredients": ["bún", "chả mọc", "giò heo", "mộc nhĩ", "hành"]
+  },
+  {
+    "name": "Cơm tấm bì chả",
+    "servingSize": "1 phần (350g)",
+    "calories": 720,
+    "protein": 30,
+    "carbs": 82,
+    "fat": 28,
+    "ingredients": ["gạo tấm", "bì lợn", "chả trứng", "nước mắm", "dưa leo"]
+  },
+  {
+    "name": "Chả giò chiên",
+    "servingSize": "3 cuốn (180g)",
+    "calories": 420,
+    "protein": 15,
+    "carbs": 38,
+    "fat": 24,
+    "ingredients": ["bánh tráng", "thịt heo", "miến", "mộc nhĩ", "dầu"]
+  },
+  {
+    "name": "Canh miso",
+    "servingSize": "1 tô (300g)",
+    "calories": 180,
+    "protein": 10,
+    "carbs": 18,
+    "fat": 6,
+    "ingredients": ["tương miso", "đậu hũ", "rong biển", "hành lá"]
+  },
+  {
+    "name": "Bánh xèo miền Trung",
+    "servingSize": "1 cái (280g)",
+    "calories": 520,
+    "protein": 18,
+    "carbs": 58,
+    "fat": 22,
+    "ingredients": ["bột gạo", "nghệ", "tôm", "thịt bò", "rau sống"]
+  },
+  {
+    "name": "Cơm rang cà ri",
+    "servingSize": "1 phần (300g)",
+    "calories": 570,
+    "protein": 22,
+    "carbs": 70,
+    "fat": 20,
+    "ingredients": ["gạo", "bột cà ri", "trứng", "hành tây", "rau củ"]
+  },
+  {
+    "name": "Thịt heo quay",
+    "servingSize": "1 phần (250g)",
+    "calories": 650,
+    "protein": 32,
+    "carbs": 5,
+    "fat": 50,
+    "ingredients": ["thịt ba chỉ", "muối", "ngũ vị hương", "giấm"]
+  },
+  {
+    "name": "Đùi gà luộc",
+    "servingSize": "1 phần (250g)",
+    "calories": 420,
+    "protein": 38,
+    "carbs": 0,
+    "fat": 28,
+    "ingredients": ["đùi gà", "muối", "gừng", "sả"]
+  },
+  {
+    "name": "Cháo hải sản",
+    "servingSize": "1 tô (400g)",
+    "calories": 360,
+    "protein": 26,
+    "carbs": 44,
+    "fat": 8,
+    "ingredients": ["gạo", "tôm", "mực", "gừng", "hành"]
+  },
+  {
+    "name": "Pad Thai",
+    "servingSize": "1 phần (350g)",
+    "calories": 620,
+    "protein": 24,
+    "carbs": 78,
+    "fat": 22,
+    "ingredients": ["mì gạo", "tôm", "đậu phộng", "trứng", "giá"]
+  },
+  {
+    "name": "Cơm gà roti",
+    "servingSize": "1 phần (350g)",
+    "calories": 700,
+    "protein": 36,
+    "carbs": 78,
+    "fat": 26,
+    "ingredients": ["gạo", "đùi gà", "nghệ", "sữa dừa", "sả"]
+  },
+  {
+    "name": "Bánh mì chả cá",
+    "servingSize": "1 ổ (250g)",
+    "calories": 450,
+    "protein": 22,
+    "carbs": 52,
+    "fat": 16,
+    "ingredients": ["bánh mì", "chả cá", "dưa leo", "hành", "nước mắm"]
+  },
+  {
+    "name": "Trứng cuộn Nhật",
+    "servingSize": "1 phần (150g)",
+    "calories": 220,
+    "protein": 14,
+    "carbs": 8,
+    "fat": 14,
+    "ingredients": ["trứng", "nước dashi", "đường", "nước tương"]
+  },
+  {
+    "name": "Cơm chiên kimchi",
+    "servingSize": "1 phần (300g)",
+    "calories": 540,
+    "protein": 18,
+    "carbs": 70,
+    "fat": 18,
+    "ingredients": ["gạo", "kimchi", "trứng", "thịt ba chỉ", "hành lá"]
+  },
+  {
+    "name": "Bò kho bánh mì",
+    "servingSize": "1 phần (400g)",
+    "calories": 650,
+    "protein": 35,
+    "carbs": 55,
+    "fat": 28,
+    "ingredients": ["thịt bò", "bánh mì", "cà rốt", "sả", "ngũ vị hương"]
+  },
+  {
+    "name": "Cơm chiên mắm ruốc",
+    "servingSize": "1 phần (300g)",
+    "calories": 530,
+    "protein": 16,
+    "carbs": 68,
+    "fat": 20,
+    "ingredients": ["gạo", "mắm ruốc", "thịt heo", "trứng", "hành lá"]
+  },
+  {
+    "name": "Lẩu cua đồng",
+    "servingSize": "1 phần (500g)",
+    "calories": 480,
+    "protein": 32,
+    "carbs": 45,
+    "fat": 18,
+    "ingredients": ["cua đồng", "bún", "mồng tơi", "cà chua", "dọc mùng"]
+  },
+  {
+    "name": "Cá kho gừng",
+    "servingSize": "1 phần (200g)",
+    "calories": 340,
+    "protein": 30,
+    "carbs": 12,
+    "fat": 18,
+    "ingredients": ["cá", "gừng", "nước mắm", "đường", "tiêu"]
+  },
+  {
+    "name": "Bánh bèo chén",
+    "servingSize": "6 chén (300g)",
+    "calories": 400,
+    "protein": 14,
+    "carbs": 62,
+    "fat": 12,
+    "ingredients": ["bột gạo", "tôm khô", "hành phi", "nước mắm"]
+  },
+  {
+    "name": "Bít tết bò",
+    "servingSize": "1 phần (300g)",
+    "calories": 580,
+    "protein": 45,
+    "carbs": 8,
+    "fat": 38,
+    "ingredients": ["thịt bò", "bơ", "tỏi", "tiêu", "muối"]
+  },
+  {
+    "name": "Cơm nắm muối vừng",
+    "servingSize": "2 nắm (200g)",
+    "calories": 320,
+    "protein": 8,
+    "carbs": 58,
+    "fat": 6,
+    "ingredients": ["gạo", "vừng", "muối", "rong biển"]
+  },
+  {
+    "name": "Cà ri gà",
+    "servingSize": "1 phần (400g)",
+    "calories": 580,
+    "protein": 35,
+    "carbs": 30,
+    "fat": 36,
+    "ingredients": ["gà", "khoai tây", "cà rốt", "bột cà ri", "sữa dừa"]
+  },
+  {
+    "name": "Chè bưởi",
+    "servingSize": "1 chén (200g)",
+    "calories": 280,
+    "protein": 4,
+    "carbs": 52,
+    "fat": 8,
+    "ingredients": ["bưởi", "đậu xanh", "bột năng", "đường", "nước cốt dừa"]
+  },
+  {
+    "name": "Trà sữa trân châu",
+    "servingSize": "1 ly (400ml)",
+    "calories": 380,
+    "protein": 5,
+    "carbs": 65,
+    "fat": 12,
+    "ingredients": ["trà", "sữa", "trân châu", "đường"]
+  },
+  {
+    "name": "Cà phê trứng",
+    "servingSize": "1 ly (200ml)",
+    "calories": 200,
+    "protein": 6,
+    "carbs": 18,
+    "fat": 12,
+    "ingredients": ["cà phê", "trứng", "sữa đặc", "đường"]
+  }
+]

@@ -47,11 +47,36 @@ public class UserHealthProfile {
     private GoalType goalType;
 
     /**
-     * Được tính toán tự động dựa trên công thức TDEE
-     * (Total Daily Energy Expenditure)
+     * Cân nặng mong muốn sau khi hoàn thành mục tiêu
+     * - GAIN_WEIGHT: desiredWeight > weightKg
+     * - LOSE_WEIGHT: desiredWeight < weightKg
+     * - MAINTAIN: desiredWeight ≈ weightKg (trong 2%)
+     */
+    @Column(name = "desired_weight_kg")
+    private Double desiredWeightKg;
+
+    /**
+     * Số ngày để đạt mục tiêu (tính từ ngày hôm nay)
+     */
+    @Column(name = "target_days")
+    private Integer targetDays;
+
+    /**
+     * Tong calories/ngay ma user CAN AN VAO de dat duoc muc tieu.
+     * Cong thuc: TDEE +/- daily_calories
      */
     @Column(name = "target_calories")
     private Double targetCalories;
+
+    /**
+     * Luong calories can BU(tru)/THANG(du) moi ngay so voi TDEE.
+     * Cong thuc: (|desiredWeightKg - weightKg| * 7700) / targetDays
+     */
+    @Column(name = "daily_calories")
+    private Double dailyCalories;
+
+    @Column(name = "preference_vector", columnDefinition = "TEXT")
+    private String preferenceVector;
 
     @CreationTimestamp
     @Column(name = "recorded_at", updatable = false)
@@ -76,19 +101,29 @@ public class UserHealthProfile {
     }
 
     /**
-     * Tính TDEE tự động dựa trên Mifflin-St Jeor Equation
-     * Gọi trước khi persist/update
+     * Tinh toan TDEE va calories theo muc tieu can nang.
      */
     @PrePersist
     @PreUpdate
     public void calculateTDEE() {
-        if (weightKg == null || heightCm == null || dob == null
-                || activityLevel == null || goalType == null)
+        if (weightKg == null || desiredWeightKg == null || goalType == null || targetDays == null || heightCm == null || dob == null || activityLevel == null) {
             return;
+        }
 
+        validateDesiredWeight();
+
+        if (targetDays <= 0) {
+            throw new IllegalArgumentException("targetDays must be greater than 0");
+        }
+
+        // Tinh muc thang du/tham hut moi ngay (dailyCalories)
+        double deltaKg = desiredWeightKg - weightKg;
+        double totalCaloriesDiff = Math.abs(deltaKg) * 7700.0;
+        dailyCalories = totalCaloriesDiff / targetDays; // Tinh luong calo can bu/tru moi ngay
+
+        // Tinh BMR va TDEE tu can nang HIEN TAI
         int age = LocalDate.now().getYear() - dob.getYear();
         double bmr;
-
         if (gender == Gender.FEMALE) {
             bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
         } else {
@@ -105,10 +140,41 @@ public class UserHealthProfile {
 
         double tdee = bmr * multiplier;
 
+        // Tinh tong luong calo nap vao moi ngay (targetCalories)
         targetCalories = switch (goalType) {
-            case LOSE_WEIGHT -> tdee - 500;
-            case GAIN_WEIGHT -> tdee + 500;
-            case MAINTAIN -> tdee;
+            case LOSE_WEIGHT -> tdee - dailyCalories; // Giam can thi phai an it hon TDEE
+            case GAIN_WEIGHT -> tdee + dailyCalories; // Tang can thi phai an nhieu hon TDEE
+            case MAINTAIN -> tdee;                    // Duy tri thi an bang TDEE
         };
+    }
+
+    /**
+     * Validate desiredWeight theo goalType
+     */
+    private void validateDesiredWeight() {
+        if (weightKg == null || desiredWeightKg == null)
+            return;
+
+        switch (goalType) {
+            case GAIN_WEIGHT:
+                if (desiredWeightKg <= weightKg) {
+                    throw new IllegalArgumentException(
+                            "Desired weight must be greater than current weight for GAIN_WEIGHT goal");
+                }
+                break;
+            case LOSE_WEIGHT:
+                if (desiredWeightKg >= weightKg) {
+                    throw new IllegalArgumentException(
+                            "Desired weight must be less than current weight for LOSE_WEIGHT goal");
+                }
+                break;
+            case MAINTAIN:
+                double toleranceRange = weightKg * 0.02; // 2% tolerance
+                if (Math.abs(desiredWeightKg - weightKg) > toleranceRange) {
+                    throw new IllegalArgumentException(
+                            "Desired weight must be within 2% of current weight for MAINTAIN goal");
+                }
+                break;
+        }
     }
 }

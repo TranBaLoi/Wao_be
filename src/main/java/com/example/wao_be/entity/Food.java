@@ -47,6 +47,12 @@ public class Food {
     @Builder.Default
     private Boolean isVerified = false;
 
+    @Column(name = "feature_vector", columnDefinition = "TEXT")
+    private String featureVector;
+
+    @Column(name = "suitable_meal_types")
+    private String suitableMealTypes;
+
     @OneToMany(mappedBy = "food", cascade = CascadeType.ALL)
     private List<UserFoodLog> foodLogs;
 
@@ -60,4 +66,3 @@ public class Food {
     @Column(name = "image_url")
     private List<String> imageUrls;
 }
-

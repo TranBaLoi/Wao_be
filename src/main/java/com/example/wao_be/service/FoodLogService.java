@@ -4,7 +4,10 @@ import com.example.wao_be.dto.FoodLogDto;
 import com.example.wao_be.entity.Food;
 import com.example.wao_be.entity.User;
 import com.example.wao_be.entity.UserFoodLog;
+import com.example.wao_be.entity.UserHealthProfile;
 import com.example.wao_be.repository.UserFoodLogRepository;
+import com.example.wao_be.repository.UserHealthProfileRepository;
+import com.example.wao_be.util.VectorUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ public class FoodLogService {
     private final UserFoodLogRepository foodLogRepository;
     private final UserService userService;
     private final FoodService foodService;
+    private final UserHealthProfileRepository userHealthProfileRepository;
 
     public FoodLogDto.Response log(Long userId, FoodLogDto.Request req) {
         User user = userService.findById(userId);
@@ -34,7 +38,34 @@ public class FoodLogService {
                 .totalCalories(0.0) // will be computed by @PrePersist
                 .logDate(req.getLogDate())
                 .build();
-        return toResponse(foodLogRepository.save(log));
+
+        UserFoodLog savedLog = foodLogRepository.save(log);
+        learnUserPreference(userId, food);
+
+        return toResponse(savedLog);
+    }
+
+    private void learnUserPreference(Long userId, Food food) {
+        if (food.getFeatureVector() == null || food.getFeatureVector().trim().isEmpty()) {
+            return; // No feature vector to learn from
+        }
+
+        userHealthProfileRepository.findFirstByUserIdOrderByRecordedAtDesc(userId)
+                .ifPresent(profile -> {
+                    if (profile.getPreferenceVector() != null && !profile.getPreferenceVector().trim().isEmpty()) {
+                        double[] userPrefs = VectorUtils.parseVector(profile.getPreferenceVector());
+                        double[] foodFeatures = VectorUtils.parseVector(food.getFeatureVector());
+
+                        double[] newPrefs = VectorUtils.updatePreferenceVector(userPrefs, foodFeatures, 0.8);
+                        profile.setPreferenceVector(VectorUtils.formatVector(newPrefs));
+
+                        userHealthProfileRepository.save(profile);
+                    } else {
+                        // Initialize preference vector with food features if it's currently empty
+                        profile.setPreferenceVector(food.getFeatureVector());
+                        userHealthProfileRepository.save(profile);
+                    }
+                });
     }
 
     @Transactional(readOnly = true)

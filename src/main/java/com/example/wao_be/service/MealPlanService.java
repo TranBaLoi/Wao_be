@@ -4,6 +4,7 @@ import com.example.wao_be.dto.MealPlanDto;
 import com.example.wao_be.entity.*;
 import com.example.wao_be.repository.MealPlanRepository;
 import com.example.wao_be.repository.UserFoodLogRepository;
+import com.example.wao_be.repository.UserHealthProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ public class MealPlanService {
 
     private final UserFoodLogRepository userFoodLogRepository;
     private final DailySummaryService dailySummaryService;
+    private final UserHealthProfileRepository userHealthProfileRepository;
+    private final AiRecommendationService aiRecommendationService;
 
     /** Tạo meal plan (system hoặc user custom) */
     public MealPlanDto.Response create(MealPlanDto.Request req) {
@@ -144,7 +147,36 @@ public class MealPlanService {
         return res;
     }
 
+    public MealPlanDto.Request generatePlan(Long userId, LocalDate date) {
+        UserHealthProfile profile = userHealthProfileRepository.findFirstByUserIdOrderByRecordedAtDesc(userId)
+                .orElseThrow(() -> new EntityNotFoundException("No health profile found for user: " + userId));
 
+        AiRecommendationService.RecommendationResultDto recommendation = aiRecommendationService.recommendMealsForDay(profile);
+
+        MealPlanDto.Request previewReq = new MealPlanDto.Request();
+        previewReq.setName("AI Generated Plan for " + date);
+        previewReq.setDescription("Generated from AI Recommendation");
+        previewReq.setType(MealPlan.MealPlanType.SYSTEM_SUGGESTION);
+        // Do not set userId for SYSTEM_SUGGESTION
+
+        List<MealPlanDto.Request.FoodItem> foodItems = new ArrayList<>();
+
+        for (AiRecommendationService.MealPlanFoodDto foodDto : recommendation.getFoods()) {
+            MealPlanDto.Request.FoodItem item = new MealPlanDto.Request.FoodItem();
+            item.setFoodId(foodDto.getFood().getId());
+            item.setMealType(foodDto.getMealType());
+            item.setServingQty(foodDto.getServingQty());
+
+            // extra info for preview
+            item.setFoodName(foodDto.getFood().getName());
+            item.setCalories(foodDto.getFood().getCalories() * foodDto.getServingQty());
+            foodItems.add(item);
+        }
+
+        previewReq.setFoods(foodItems);
+
+        return previewReq;
+    }
 
     // ---- Mapper ----
     private MealPlanDto.Response toResponse(MealPlan mp) {
@@ -175,4 +207,3 @@ public class MealPlanService {
         return r;
     }
 }
-

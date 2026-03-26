@@ -1,6 +1,7 @@
 // sua de tranh config voi voi loi
 package com.example.wao_be.service;
 
+import com.example.wao_be.dto.DailyCalorieBreakdownDto;
 import com.example.wao_be.dto.HealthProfileDto;
 import com.example.wao_be.entity.User;
 import com.example.wao_be.entity.UserHealthProfile;
@@ -37,7 +38,11 @@ public class HealthProfileService {
                 .weightKg(req.getWeightKg())
                 .activityLevel(req.getActivityLevel())
                 .goalType(req.getGoalType())
+                .desiredWeightKg(req.getDesiredWeightKg())
+                .targetDays(req.getTargetDays())
+                .preferenceVector(req.getPreferenceVector())
                 .build();
+        // targetCalories và dailyCalories sẽ tự được tính trong @PrePersist
 
         UserHealthProfile savedProfile = profileRepository.save(profile);
         saveWeightLogIfNeeded(user, latestProfile.orElse(null), savedProfile);
@@ -69,7 +74,17 @@ public class HealthProfileService {
         r.setWeightKg(p.getWeightKg());
         r.setActivityLevel(p.getActivityLevel());
         r.setGoalType(p.getGoalType());
+        r.setDesiredWeightKg(p.getDesiredWeightKg());
+        r.setTargetDays(p.getTargetDays());
         r.setTargetCalories(p.getTargetCalories());
+        r.setDailyCalories(p.getDailyCalories());
+        r.setPreferenceVector(p.getPreferenceVector());
+
+        // Danh gia muc do kho (EASY/MEDIUM/HARD) dua tren dailyCalories
+        if (p.getDailyCalories() != null) {
+            r.setDailyCalorieBreakdown(DailyCalorieBreakdownDto.fromDailyCalories(p.getDailyCalories()));
+        }
+
         return r;
     }
 

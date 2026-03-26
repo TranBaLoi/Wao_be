@@ -79,5 +79,15 @@ public class MealPlanController {
             @Valid @RequestBody MealPlanDto.ApplyRequest req) {
         return ResponseEntity.ok(mealPlanService.applyToDate(mealPlanId, req));
     }
-}
 
+    /**
+     * POST /api/meal-plans/generate?userId=...&date=YYYY-MM-DD
+     * Preview tạo meal plan bằng AI Recommendation (chưa lưu)
+     */
+    @PostMapping("/generate")
+    public ResponseEntity<MealPlanDto.Request> generate(
+            @RequestParam Long userId,
+            @RequestParam java.time.LocalDate date) {
+        return ResponseEntity.ok(mealPlanService.generatePlan(userId, date));
+    }
+}

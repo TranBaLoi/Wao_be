@@ -43,13 +43,35 @@ public class DailySummaryService {
         int water     = waterLogRepository.sumWaterByUserIdAndLogDate(userId, date);
         int steps     = stepLogRepository.sumStepsByUserIdAndLogDate(userId, date);
 
-        // Lấy mục tiêu calo từ profile mới nhất
-        double targetCalories = healthProfileRepository
+        UserHealthProfile latestProfile = healthProfileRepository
                 .findFirstByUserIdOrderByRecordedAtDesc(userId)
-                .map(UserHealthProfile::getTargetCalories)
-                .orElse(2000.0);
+                .orElse(null);
 
-        boolean goalAchieved = calIn <= targetCalories && calOut > 0;
+        // targetCalories lúc này là TDEE +/- dailyCalories (Tổng calo cần ăn 1 ngày)
+        double targetCalories = latestProfile != null && latestProfile.getTargetCalories() != null
+                ? latestProfile.getTargetCalories()
+                : 2000.0;
+
+        // Số calo net = lượng nạp vào - lượng tiêu hao phụ thêm (để so sánh với mục tiêu theo TDEE)
+        // Lưu ý: TDEE đã bao gồm calOut cơ bản. Ở đây nếu calOut là calOut từ tập luyện TAI APP
+        // thì mình so sánh tuỳ theo business (thường Net = calIn sẽ so với targetCalories).
+        // Giả sử: calIn là tổng ăn, cần đạt đủ targetCalories (đã trừ/cộng).
+        double netCalories = calIn; // Tập trung vào calIn để đạt target ăn uống.
+
+        boolean goalAchieved;
+        if (latestProfile != null && latestProfile.getGoalType() != null) {
+            switch (latestProfile.getGoalType()) {
+                // Tăng cân: Phải ăn lớn hơn hoặc bằng target
+                case GAIN_WEIGHT -> goalAchieved = netCalories >= targetCalories;
+                // Giảm cân: Ăn nhỏ hơn hoặc bằng target (nhưng nên có mức min để an toàn, tạm check <= target)
+                case LOSE_WEIGHT -> goalAchieved = netCalories <= targetCalories && netCalories > 0;
+                // Duy trì: Dao động +- 100 calo
+                case MAINTAIN -> goalAchieved = Math.abs(netCalories - targetCalories) <= 100 && netCalories > 0;
+                default -> goalAchieved = false;
+            }
+        } else {
+            goalAchieved = Math.abs(netCalories - targetCalories) <= 100 && netCalories > 0;
+        }
 
         DailySummary summary = dailySummaryRepository
                 .findByUserIdAndLogDate(userId, date)
@@ -92,4 +114,3 @@ public class DailySummaryService {
         return dto;
     }
 }
-

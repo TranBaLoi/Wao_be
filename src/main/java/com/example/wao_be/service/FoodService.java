@@ -68,6 +68,19 @@ public class FoodService {
         return toResponse(findById(id));
     }
 
+    public FoodDto.Response update(Long id, FoodDto.Request req) {
+        Food food = findById(id);
+        food.setName(req.getName());
+        food.setServingSize(req.getServingSize());
+        food.setCalories(req.getCalories());
+        food.setProtein(req.getProtein());
+        food.setCarbs(req.getCarbs());
+        food.setFat(req.getFat());
+        food.setFeatureVector(req.getFeatureVector());
+        food.setSuitableMealTypes(req.getSuitableMealTypes());
+        return toResponse(foodRepository.save(food));
+    }
+
     public void delete(Long id) {
         Food food = findById(id);
         List<String> imageUrls = food.getImageUrls() == null
@@ -101,6 +114,8 @@ public class FoodService {
         r.setCarbs(f.getCarbs());
         r.setFat(f.getFat());
         r.setIsVerified(f.getIsVerified());
+        r.setFeatureVector(f.getFeatureVector());
+        r.setSuitableMealTypes(f.getSuitableMealTypes());
         r.setImageUrls(f.getImageUrls() == null ? List.of() : new ArrayList<>(f.getImageUrls()));
         return r;
     }
@@ -123,6 +138,22 @@ public class FoodService {
                 .carbs(req.getCarbs())
                 .fat(req.getFat())
                 .isVerified(isVerified)
+                .featureVector(req.getFeatureVector())
+                .suitableMealTypes(req.getSuitableMealTypes())
+                .build();
+    }
+
+    private Food toFood(FoodDto.FormRequest req, boolean isVerified) {
+        return Food.builder()
+                .name(req.getName())
+                .servingSize(req.getServingSize())
+                .calories(req.getCalories())
+                .protein(req.getProtein())
+                .carbs(req.getCarbs())
+                .fat(req.getFat())
+                .isVerified(isVerified)
+                .featureVector(req.getFeatureVector())
+                .suitableMealTypes(req.getSuitableMealTypes())
                 .imageUrls(new ArrayList<>())
                 .build();
     }

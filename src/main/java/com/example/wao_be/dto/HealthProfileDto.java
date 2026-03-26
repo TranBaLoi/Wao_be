@@ -27,6 +27,14 @@ public class HealthProfileDto {
 
         @NotNull
         private UserHealthProfile.GoalType goalType;
+
+        @NotNull
+        private Double desiredWeightKg;
+
+        @NotNull
+        private Integer targetDays;
+
+        private String preferenceVector;
     }
 
     @Data
@@ -39,7 +47,12 @@ public class HealthProfileDto {
         private Double weightKg;
         private UserHealthProfile.ActivityLevel activityLevel;
         private UserHealthProfile.GoalType goalType;
+        private Double desiredWeightKg;
+        private Integer targetDays;
         private Double targetCalories;
+        private Double dailyCalories;
+        private DailyCalorieBreakdownDto dailyCalorieBreakdown;
+
+        private String preferenceVector;
     }
 }
-

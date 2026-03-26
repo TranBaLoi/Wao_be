@@ -38,6 +38,10 @@ public class MealPlanDto {
 
             @NotNull @Positive
             private Double servingQty;
+
+            // Extra fields for preview purpose (ignored during creation)
+            private String foodName;
+            private Double calories;
         }
     }
 
@@ -83,4 +87,3 @@ public class MealPlanDto {
     }
 
 }
-
