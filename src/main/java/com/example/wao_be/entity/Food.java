@@ -54,8 +54,10 @@ public class Food {
     @OneToMany(mappedBy = "food", cascade = CascadeType.ALL)
     private List<MealPlanFood> mealPlanFoods;
 
-    @OneToMany(mappedBy = "food", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<FoodImage> images = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "food_images", joinColumns = @JoinColumn(name = "foods_id"))
+    @Column(name = "image_url")
+    private List<String> imageUrls;
 }
 

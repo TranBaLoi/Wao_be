@@ -4,27 +4,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public class FoodDto {
 
+
     @Data
     public static class Request {
-        @NotBlank
-        private String name;
-        private String servingSize;
-
-        @NotNull @Positive
-        private Double calories;
-        private Double protein;
-        private Double carbs;
-        private Double fat;
-    }
-
-    @Data
-    public static class FormRequest {
         @NotBlank
         private String name;
         private String servingSize;
@@ -35,7 +22,6 @@ public class FoodDto {
         private Double protein;
         private Double carbs;
         private Double fat;
-        private List<MultipartFile> images;
     }
 
     @Data
@@ -48,7 +34,8 @@ public class FoodDto {
         private Double carbs;
         private Double fat;
         private Boolean isVerified;
-        private List<FoodImageDto.Response> images;
+        /** Danh sach URL anh da upload len Cloudinary */
+        private List<String> imageUrls;
     }
 }
 

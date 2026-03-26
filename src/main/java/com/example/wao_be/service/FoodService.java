@@ -1,14 +1,16 @@
 package com.example.wao_be.service;
 
 import com.example.wao_be.dto.FoodDto;
-import com.example.wao_be.dto.FoodImageDto;
 import com.example.wao_be.entity.Food;
 import com.example.wao_be.repository.FoodRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,21 +19,22 @@ import java.util.List;
 public class FoodService {
 
     private final FoodRepository foodRepository;
-    private final FoodImageService foodImageService;
+    private final ImageStorageService imageStorageService;
 
-    public FoodDto.Response create(FoodDto.Request req, boolean isVerified) {
+    public FoodDto.Response create(FoodDto.Request req, List<MultipartFile> images, boolean isVerified) {
         Food food = toFood(req, isVerified);
-        return toResponse(foodRepository.save(food));
-    }
-
-    public FoodDto.Response createFromForm(FoodDto.FormRequest req, boolean isVerified) {
-        Food food = toFood(req, isVerified);
+        food.setImageUrls(new ArrayList<>());
         Food savedFood = foodRepository.save(food);
-        foodImageService.addMany(savedFood.getId(), req.getImages());
+
+        List<String> uploadedUrls = uploadImages(images);
+        if (!uploadedUrls.isEmpty()) {
+            savedFood.getImageUrls().addAll(uploadedUrls);
+            savedFood = foodRepository.save(savedFood);
+        }
         return toResponse(savedFood);
     }
 
-    public FoodDto.Response updateFromForm(Long id, FoodDto.FormRequest req) {
+    public FoodDto.Response update(Long id, FoodDto.Request req, List<MultipartFile> images) {
         Food food = findById(id);
         food.setName(req.getName());
         food.setServingSize(req.getServingSize());
@@ -40,9 +43,15 @@ public class FoodService {
         food.setCarbs(req.getCarbs());
         food.setFat(req.getFat());
 
-        Food savedFood = foodRepository.save(food);
-        foodImageService.addMany(savedFood.getId(), req.getImages());
-        return toResponse(savedFood);
+        if (food.getImageUrls() == null) {
+            food.setImageUrls(new ArrayList<>());
+        }
+
+        // Update form-data se upload them anh moi, khong xoa anh cu.
+        List<String> uploadedUrls = uploadImages(images);
+        food.getImageUrls().addAll(uploadedUrls);
+
+        return toResponse(foodRepository.save(food));
     }
 
     @Transactional(readOnly = true)
@@ -59,20 +68,22 @@ public class FoodService {
         return toResponse(findById(id));
     }
 
-    public FoodDto.Response update(Long id, FoodDto.Request req) {
-        Food food = findById(id);
-        food.setName(req.getName());
-        food.setServingSize(req.getServingSize());
-        food.setCalories(req.getCalories());
-        food.setProtein(req.getProtein());
-        food.setCarbs(req.getCarbs());
-        food.setFat(req.getFat());
-        return toResponse(foodRepository.save(food));
-    }
-
     public void delete(Long id) {
         Food food = findById(id);
+        List<String> imageUrls = food.getImageUrls() == null
+                ? List.of()
+                : new ArrayList<>(food.getImageUrls());
+
         foodRepository.delete(food);
+
+        // Xoa anh tren Cloudinary theo co che best-effort de tranh ton tai orphan file.
+        for (String imageUrl : imageUrls) {
+            try {
+                imageStorageService.deleteImage(imageUrl);
+            } catch (IOException ignored) {
+                // Bo qua loi xoa remote; ban ghi DB da bi xoa thanh cong.
+            }
+        }
     }
 
     public Food findById(Long id) {
@@ -90,10 +101,18 @@ public class FoodService {
         r.setCarbs(f.getCarbs());
         r.setFat(f.getFat());
         r.setIsVerified(f.getIsVerified());
-        List<FoodImageDto.Response> images = foodImageService.getByFoodId(f.getId());
-        r.setImages(images);
+        r.setImageUrls(f.getImageUrls() == null ? List.of() : new ArrayList<>(f.getImageUrls()));
         return r;
     }
+
+    private List<String> uploadImages(List<MultipartFile> images) {
+        try {
+            return imageStorageService.uploadImages(images);
+        } catch (IOException e) {
+            throw new IllegalStateException("Upload food images failed", e);
+        }
+    }
+
 
     private Food toFood(FoodDto.Request req, boolean isVerified) {
         return Food.builder()
@@ -104,18 +123,7 @@ public class FoodService {
                 .carbs(req.getCarbs())
                 .fat(req.getFat())
                 .isVerified(isVerified)
-                .build();
-    }
-
-    private Food toFood(FoodDto.FormRequest req, boolean isVerified) {
-        return Food.builder()
-                .name(req.getName())
-                .servingSize(req.getServingSize())
-                .calories(req.getCalories())
-                .protein(req.getProtein())
-                .carbs(req.getCarbs())
-                .fat(req.getFat())
-                .isVerified(isVerified)
+                .imageUrls(new ArrayList<>())
                 .build();
     }
 }
