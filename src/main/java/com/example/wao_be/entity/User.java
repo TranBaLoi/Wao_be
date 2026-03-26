@@ -43,6 +43,10 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // New avatar/image column to store user's avatar URL (e.g., from Google)
+    @Column(name = "img", length = 500)
+    private String img;
+
     // Relationships
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserHealthProfile> healthProfiles;
@@ -70,4 +74,3 @@ public class User {
         ACTIVE, INACTIVE, BANNED
     }
 }
-

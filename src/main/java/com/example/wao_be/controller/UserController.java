@@ -1,5 +1,6 @@
 package com.example.wao_be.controller;
 
+import com.example.wao_be.dto.GoogleAuthDto;
 import com.example.wao_be.dto.UserDto;
 import com.example.wao_be.service.UserService;
 import jakarta.validation.Valid;
@@ -21,6 +22,18 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<UserDto.Response> register(@Valid @RequestBody UserDto.RegisterRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(req));
+    }
+
+    /** POST /api/users/google-login */
+    @PostMapping("/google-login")
+    public ResponseEntity<UserDto.Response> loginWithGoogle(@RequestBody GoogleAuthDto.GoogleLoginRequest req) {
+        return ResponseEntity.ok(userService.loginWithGoogle(req));
+    }
+
+    /** POST /api/users/verify */
+    @PostMapping("/verify")
+    public ResponseEntity<GoogleAuthDto.VerifyEmailResponse> verifyEmail(@RequestBody GoogleAuthDto.VerifyEmailRequest req) {
+        return ResponseEntity.ok(userService.verifyEmail(req));
     }
 
     /** GET /api/users */
@@ -49,4 +62,3 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 }
-

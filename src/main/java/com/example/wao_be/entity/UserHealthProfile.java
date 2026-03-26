@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+// cần phải thêm log vào mới thống kê được
 @Entity
 @Table(name = "user_health_profiles")
 @Getter
@@ -61,17 +62,17 @@ public class UserHealthProfile {
     }
 
     public enum ActivityLevel {
-        SEDENTARY,          // Ít vận động
-        LIGHTLY_ACTIVE,     // Nhẹ nhàng 1-3 ngày/tuần
-        MODERATELY_ACTIVE,  // Vừa phải 3-5 ngày/tuần
-        VERY_ACTIVE,        // Nhiều 6-7 ngày/tuần
-        EXTRA_ACTIVE        // Cực kỳ nhiều
+        SEDENTARY, // Ít vận động
+        LIGHTLY_ACTIVE, // Nhẹ nhàng 1-3 ngày/tuần
+        MODERATELY_ACTIVE, // Vừa phải 3-5 ngày/tuần
+        VERY_ACTIVE, // Nhiều 6-7 ngày/tuần
+        EXTRA_ACTIVE // Cực kỳ nhiều
     }
 
     public enum GoalType {
-        LOSE_WEIGHT,    // Giảm cân
-        GAIN_WEIGHT,    // Tăng cân
-        MAINTAIN        // Duy trì
+        LOSE_WEIGHT, // Giảm cân
+        GAIN_WEIGHT, // Tăng cân
+        MAINTAIN // Duy trì
     }
 
     /**
@@ -82,7 +83,8 @@ public class UserHealthProfile {
     @PreUpdate
     public void calculateTDEE() {
         if (weightKg == null || heightCm == null || dob == null
-                || activityLevel == null || goalType == null) return;
+                || activityLevel == null || goalType == null)
+            return;
 
         int age = LocalDate.now().getYear() - dob.getYear();
         double bmr;
@@ -110,4 +112,3 @@ public class UserHealthProfile {
         };
     }
 }
-

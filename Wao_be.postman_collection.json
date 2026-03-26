@@ -1,0 +1,495 @@
+{
+  "info": {
+    "_postman_id": "f6e2f7ff-7a11-4ab9-b4a2-c087cc03aa0e",
+    "name": "Wao_be API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for Wao_be health tracking backend."
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "userId", "value": "1" },
+    { "key": "foodId", "value": "1" },
+    { "key": "exerciseId", "value": "1" },
+    { "key": "programId", "value": "1" },
+    { "key": "logId", "value": "1" },
+    { "key": "date", "value": "2026-03-21" },
+    { "key": "from", "value": "2026-03-01" },
+    { "key": "to", "value": "2026-03-21" }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"123456\",\n  \"fullName\": \"Nguyen Van A\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/register"
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "Get User By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nguyen Van B\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/users/{{userId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Profiles",
+      "item": [
+        {
+          "name": "Create Health Profile",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"gender\": \"MALE\",\n  \"dob\": \"1998-01-20\",\n  \"heightCm\": 172,\n  \"weightKg\": 70,\n  \"activityLevel\": \"MODERATELY_ACTIVE\",\n  \"goalType\": \"MAINTAIN\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{userId}}/health-profiles"
+          }
+        },
+        {
+          "name": "Get Latest Health Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}/health-profiles/latest"
+          }
+        },
+        {
+          "name": "Get Health Profile History",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}/health-profiles/history"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Foods",
+      "item": [
+        {
+          "name": "Create Food (User)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Com ga\",\n  \"servingSize\": \"1 dia\",\n  \"calories\": 500,\n  \"protein\": 25,\n  \"carbs\": 60,\n  \"fat\": 15\n}"
+            },
+            "url": "{{baseUrl}}/api/foods"
+          }
+        },
+        {
+          "name": "Create Food (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Yen mach\",\n  \"servingSize\": \"100g\",\n  \"calories\": 380,\n  \"protein\": 13,\n  \"carbs\": 68,\n  \"fat\": 7\n}"
+            },
+            "url": "{{baseUrl}}/api/foods/admin"
+          }
+        },
+        {
+          "name": "Search Foods",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/foods?name=com"
+          }
+        },
+        {
+          "name": "Get Food By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/foods/{{foodId}}"
+          }
+        },
+        {
+          "name": "Update Food",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Com ga update\",\n  \"servingSize\": \"1 dia\",\n  \"calories\": 520,\n  \"protein\": 27,\n  \"carbs\": 58,\n  \"fat\": 16\n}"
+            },
+            "url": "{{baseUrl}}/api/foods/{{foodId}}"
+          }
+        },
+        {
+          "name": "Delete Food",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/foods/{{foodId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Food Logs",
+      "item": [
+        {
+          "name": "Create Food Log",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"foodId\": {{foodId}},\n  \"mealType\": \"LUNCH\",\n  \"servingQty\": 1.5,\n  \"logDate\": \"{{date}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{userId}}/food-logs"
+          }
+        },
+        {
+          "name": "Get Food Logs By Date",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}/food-logs?date={{date}}"
+          }
+        },
+        {
+          "name": "Delete Food Log",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/users/{{userId}}/food-logs/{{logId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exercises",
+      "item": [
+        {
+          "name": "Create Exercise",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jumping Jack\",\n  \"categoryId\": 1,\n  \"videoUrl\": \"https://example.com/video\",\n  \"caloriesPerMin\": 8.5,\n  \"description\": \"Cardio co ban\"\n}"
+            },
+            "url": "{{baseUrl}}/api/exercises"
+          }
+        },
+        {
+          "name": "Search Exercises",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/exercises?name=jump"
+          }
+        },
+        {
+          "name": "Get Exercises By Category",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/exercises/category/1"
+          }
+        },
+        {
+          "name": "Get Exercise By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/exercises/{{exerciseId}}"
+          }
+        },
+        {
+          "name": "Delete Exercise",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/exercises/{{exerciseId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Workout Programs",
+      "item": [
+        {
+          "name": "Create Workout Program",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fat Burn 30m\",\n  \"level\": \"BEGINNER\",\n  \"estimatedDuration\": 30,\n  \"description\": \"Chuong trinh dot mo\",\n  \"exercises\": [\n    {\n      \"exerciseId\": {{exerciseId}},\n      \"orderIndex\": 1,\n      \"sets\": 3,\n      \"reps\": 15,\n      \"restTimeSec\": 45\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/workout-programs"
+          }
+        },
+        {
+          "name": "Get All Workout Programs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/workout-programs"
+          }
+        },
+        {
+          "name": "Get Workout Programs By Level",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/workout-programs?level=BEGINNER"
+          }
+        },
+        {
+          "name": "Get Workout Program By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/workout-programs/{{programId}}"
+          }
+        },
+        {
+          "name": "Delete Workout Program",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/workout-programs/{{programId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Meal Plans",
+      "item": [
+        {
+          "name": "Create Meal Plan (System)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Low Carb Day\",\n  \"description\": \"Mau an cho 1 ngay\",\n  \"type\": \"SYSTEM_SUGGESTION\",\n  \"foods\": [\n    {\n      \"foodId\": {{foodId}},\n      \"mealType\": \"BREAKFAST\",\n      \"servingQty\": 1.0\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/meal-plans"
+          }
+        },
+        {
+          "name": "Create Meal Plan (User Custom)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ke hoach cua toi\",\n  \"description\": \"Danh cho cat mo\",\n  \"type\": \"USER_CUSTOM\",\n  \"userId\": {{userId}},\n  \"foods\": [\n    {\n      \"foodId\": {{foodId}},\n      \"mealType\": \"LUNCH\",\n      \"servingQty\": 1.5\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/meal-plans"
+          }
+        },
+        {
+          "name": "Get All Meal Plans",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/meal-plans"
+          }
+        },
+        {
+          "name": "Get System Meal Plans",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/meal-plans/system"
+          }
+        },
+        {
+          "name": "Get User Meal Plans",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/meal-plans/user/{{userId}}"
+          }
+        },
+        {
+          "name": "Get Meal Plan By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/meal-plans/1"
+          }
+        },
+        {
+          "name": "Delete Meal Plan",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/meal-plans/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Workout Logs",
+      "item": [
+        {
+          "name": "Create Workout Log (Exercise)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exerciseId\": {{exerciseId}},\n  \"durationMin\": 30,\n  \"logDate\": \"{{date}}\",\n  \"note\": \"Tap buoi sang\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{userId}}/workout-logs"
+          }
+        },
+        {
+          "name": "Create Workout Log (Program)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"programId\": {{programId}},\n  \"durationMin\": 45,\n  \"logDate\": \"{{date}}\",\n  \"note\": \"Tap theo giao an\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{userId}}/workout-logs"
+          }
+        },
+        {
+          "name": "Get Workout Logs By Date",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}/workout-logs?date={{date}}"
+          }
+        },
+        {
+          "name": "Delete Workout Log",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/users/{{userId}}/workout-logs/{{logId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Step Logs",
+      "item": [
+        {
+          "name": "Create Step Log",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stepCount\": 8500,\n  \"logDate\": \"{{date}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{userId}}/step-logs"
+          }
+        },
+        {
+          "name": "Get Step Log By Date",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}/step-logs/date?date={{date}}"
+          }
+        },
+        {
+          "name": "Get Step Logs By Range",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}/step-logs?from={{from}}&to={{to}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Water Logs",
+      "item": [
+        {
+          "name": "Create Water Log",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amountMl\": 250,\n  \"logTime\": \"2026-03-21T09:30:00\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{userId}}/water-logs"
+          }
+        },
+        {
+          "name": "Get Water Logs By Date",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}/water-logs?date={{date}}"
+          }
+        },
+        {
+          "name": "Get Total Water By Date",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}/water-logs/total?date={{date}}"
+          }
+        },
+        {
+          "name": "Delete Water Log",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/users/{{userId}}/water-logs/{{logId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Daily Summaries",
+      "item": [
+        {
+          "name": "Get Today Summary",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}/daily-summaries/today"
+          }
+        },
+        {
+          "name": "Get Summary By Date",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}/daily-summaries?date={{date}}"
+          }
+        },
+        {
+          "name": "Get Summary History",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}/daily-summaries/history?from={{from}}&to={{to}}"
+          }
+        },
+        {
+          "name": "Refresh Summary",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/users/{{userId}}/daily-summaries/refresh?date={{date}}"
+          }
+        }
+      ]
+    }
+  ]
+}
+
