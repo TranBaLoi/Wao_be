@@ -97,12 +97,14 @@ public class StatisticsService {
         LocalDateTime fromDateTime = from.atStartOfDay();
         LocalDateTime toDateTime = to.plusDays(1).atStartOfDay().minusNanos(1);
 
-        Map<LocalDate, WeightAccumulator> buckets = initWeightBuckets(from, to, groupBy);
+        // nam them: can nang luon tra ve theo tung ngay, lay newWeight moi nhat cua ngay do
+        Map<LocalDate, WeightAccumulator> buckets = initWeightBuckets(from, to);
         List<WeightLog> logs = weightLogRepository.findByUserIdAndLoggedAtBetweenOrderByLoggedAtAsc(
                 userId, fromDateTime, toDateTime);
 
         for (WeightLog log : logs) {
-            buckets.get(bucketDate(log.getLoggedAt().toLocalDate(), groupBy)).add(log);
+            LocalDate bucketKey = log.getLoggedAt().toLocalDate();
+            buckets.computeIfAbsent(bucketKey, ignored -> new WeightAccumulator()).add(log);
         }
 
         List<StatisticsDto.WeightPoint> points = new ArrayList<>();
@@ -120,8 +122,8 @@ public class StatisticsService {
             point.setLogCount(accumulator.logCount);
             points.add(point);
 
-            if (accumulator.startWeight != null && firstWeight == null) {
-                firstWeight = accumulator.startWeight;
+            if (accumulator.endWeight != null && firstWeight == null) {
+                firstWeight = accumulator.endWeight;
             }
             if (accumulator.endWeight != null) {
                 lastWeight = accumulator.endWeight;
@@ -132,7 +134,7 @@ public class StatisticsService {
         response.setUserId(userId);
         response.setFrom(from);
         response.setTo(to);
-        response.setGroupBy(groupBy);
+        response.setGroupBy(StatisticsDto.GroupBy.DAY);
         response.setOverallChange(firstWeight != null && lastWeight != null ? lastWeight - firstWeight : null);
         response.setPoints(points);
         return response;
@@ -155,15 +157,14 @@ public class StatisticsService {
 
     private Map<LocalDate, WeightAccumulator> initWeightBuckets(
             LocalDate from,
-            LocalDate to,
-            StatisticsDto.GroupBy groupBy) {
+            LocalDate to) {
         Map<LocalDate, WeightAccumulator> buckets = new LinkedHashMap<>();
-        LocalDate cursor = bucketDate(from, groupBy);
-        LocalDate endBucket = bucketDate(to, groupBy);
+        LocalDate cursor = from;
+        LocalDate endBucket = to;
 
         while (!cursor.isAfter(endBucket)) {
             buckets.put(cursor, new WeightAccumulator());
-            cursor = nextBucket(cursor, groupBy);
+            cursor = cursor.plusDays(1);
         }
         return buckets;
     }
