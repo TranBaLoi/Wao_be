@@ -24,6 +24,9 @@ public class FoodDto {
 
         private String featureVector;
         private String suitableMealTypes;
+
+        private String ingredients;
+        private String containsAllergens;
     }
 
     @Data
@@ -41,6 +44,9 @@ public class FoodDto {
 
         private String featureVector;
         private String suitableMealTypes;
+
+        private String ingredients;
+        private String containsAllergens;
     }
 
     @Data
@@ -56,8 +62,11 @@ public class FoodDto {
 
         private String featureVector;
         private String suitableMealTypes;
+
+        private String ingredients;
+        private String containsAllergens;
+
         /** Danh sach URL anh da upload len Cloudinary */
         private List<String> imageUrls;
     }
 }
-

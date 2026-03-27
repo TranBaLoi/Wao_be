@@ -50,6 +50,12 @@ public class Food {
     @Column(name = "feature_vector", columnDefinition = "TEXT")
     private String featureVector;
 
+    @Column(name = "ingredients", columnDefinition = "TEXT")
+    private String ingredients;
+
+    @Column(name = "contains_allergens")
+    private String containsAllergens;
+
     @Column(name = "suitable_meal_types")
     private String suitableMealTypes;
 

@@ -35,6 +35,7 @@ public class HealthProfileDto {
         private Integer targetDays;
 
         private String preferenceVector;
+        private String allergies;
     }
 
     @Data
@@ -54,5 +55,6 @@ public class HealthProfileDto {
         private DailyCalorieBreakdownDto dailyCalorieBreakdown;
 
         private String preferenceVector;
+        private String allergies;
     }
 }

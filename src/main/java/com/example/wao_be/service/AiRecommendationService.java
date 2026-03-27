@@ -12,7 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,17 +54,17 @@ public class AiRecommendationService {
 
         List<MealPlanFoodDto> allFoods = new ArrayList<>();
 
-        List<Food> breakfastCombo = getMealCombo(breakfastCalo, "BREAKFAST", userVector);
+        List<Food> breakfastCombo = getMealCombo(breakfastCalo, "BREAKFAST", userVector, profile.getAllergies());
         for (Food f : breakfastCombo) {
             allFoods.add(new MealPlanFoodDto(f, UserFoodLog.MealType.BREAKFAST, 1.0));
         }
 
-        List<Food> lunchCombo = getMealCombo(lunchCalo, "LUNCH", userVector);
+        List<Food> lunchCombo = getMealCombo(lunchCalo, "LUNCH", userVector, profile.getAllergies());
         for (Food f : lunchCombo) {
             allFoods.add(new MealPlanFoodDto(f, UserFoodLog.MealType.LUNCH, 1.0));
         }
 
-        List<Food> dinnerCombo = getMealCombo(dinnerCalo, "DINNER", userVector);
+        List<Food> dinnerCombo = getMealCombo(dinnerCalo, "DINNER", userVector, profile.getAllergies());
         for (Food f : dinnerCombo) {
             allFoods.add(new MealPlanFoodDto(f, UserFoodLog.MealType.DINNER, 1.0));
         }
@@ -68,11 +72,35 @@ public class AiRecommendationService {
         return new RecommendationResultDto(allFoods);
     }
 
-    private List<Food> getMealCombo(double targetCalo, String mealType, double[] userVector) {
+    private boolean isSafeToEat(String userAllergies, String foodAllergens) {
+        if (userAllergies == null || userAllergies.trim().isEmpty() ||
+            foodAllergens == null || foodAllergens.trim().isEmpty()) {
+            return true;
+        }
+        Set<String> uAllergies = Arrays.stream(userAllergies.split(","))
+                                       .map(String::trim)
+                                       .map(String::toUpperCase)
+                                       .collect(Collectors.toSet());
+        Set<String> fAllergens = Arrays.stream(foodAllergens.split(","))
+                                       .map(String::trim)
+                                       .map(String::toUpperCase)
+                                       .collect(Collectors.toSet());
+        return Collections.disjoint(uAllergies, fAllergens);
+    }
+
+    private List<Food> getMealCombo(double targetCalo, String mealType, double[] userVector, String userAllergies) {
         List<Food> candidates = foodRepository.findBySuitableMealTypesContaining(mealType);
 
         if (candidates == null || candidates.isEmpty()) {
             throw new RuntimeException("Cannot find any suitable candidate food for " + mealType);
+        }
+
+        candidates = candidates.stream()
+                .filter(food -> isSafeToEat(userAllergies, food.getContainsAllergens()))
+                .collect(Collectors.toList());
+
+        if (candidates.isEmpty()) {
+            throw new RuntimeException("Cannot find any safe candidate food for " + mealType + " after allergy filtering");
         }
 
         candidates.sort((f1, f2) -> {

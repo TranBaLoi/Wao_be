@@ -76,7 +76,10 @@ public class UserHealthProfile {
     private Double dailyCalories;
 
     @Column(name = "preference_vector", columnDefinition = "TEXT")
-    private String preferenceVector;
+    private String preferenceVector; // Ví dụ: "1.0, 0.5, 0.2, ..."
+
+    @Column(name = "allergies")
+    private String allergies; // Ví dụ: "PEANUT, MILK"
 
     @CreationTimestamp
     @Column(name = "recorded_at", updatable = false)

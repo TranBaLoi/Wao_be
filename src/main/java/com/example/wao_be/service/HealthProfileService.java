@@ -41,8 +41,9 @@ public class HealthProfileService {
                 .desiredWeightKg(req.getDesiredWeightKg())
                 .targetDays(req.getTargetDays())
                 .preferenceVector(req.getPreferenceVector())
+                .allergies(req.getAllergies())
                 .build();
-        // targetCalories và dailyCalories sẽ tự được tính trong @PrePersist
+        // targetCalories v dailyCalories s t ‘c tnh trong @PrePersist
 
         UserHealthProfile savedProfile = profileRepository.save(profile);
         saveWeightLogIfNeeded(user, latestProfile.orElse(null), savedProfile);
@@ -79,6 +80,7 @@ public class HealthProfileService {
         r.setTargetCalories(p.getTargetCalories());
         r.setDailyCalories(p.getDailyCalories());
         r.setPreferenceVector(p.getPreferenceVector());
+        r.setAllergies(p.getAllergies());
 
         // Danh gia muc do kho (EASY/MEDIUM/HARD) dua tren dailyCalories
         if (p.getDailyCalories() != null) {
