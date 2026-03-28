@@ -2,12 +2,14 @@ package com.example.wao_be.controller;
 
 import com.example.wao_be.dto.GoogleAuthDto;
 import com.example.wao_be.dto.UserDto;
+import com.example.wao_be.service.ImageStorageService;
 import com.example.wao_be.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final ImageStorageService imageStorageService;
 
     /** POST /api/users/register */
     @PostMapping("/register")
@@ -53,6 +56,22 @@ public class UserController {
     public ResponseEntity<UserDto.Response> update(@PathVariable Long id,
                                                    @RequestBody UserDto.UpdateRequest req) {
         return ResponseEntity.ok(userService.update(id, req));
+    }
+
+    /** PUT /api/users/{id}/password */
+    @PutMapping("/{id}/password")
+    public ResponseEntity<Void> changePassword(@PathVariable Long id,
+                                               @Valid @RequestBody UserDto.ChangePasswordRequest req) {
+        userService.changePassword(id, req);
+        return ResponseEntity.ok().build();
+    }
+
+    /** POST /api/users/{id}/avatar */
+    @PostMapping("/{id}/avatar")
+    public ResponseEntity<UserDto.Response> uploadAvatar(@PathVariable Long id,
+                                                         @RequestParam("file") MultipartFile file) throws Exception {
+        String avatarUrl = imageStorageService.uploadAvatar(file);
+        return ResponseEntity.ok(userService.updateAvatarUrl(id, avatarUrl));
     }
 
     /** DELETE /api/users/{id} */

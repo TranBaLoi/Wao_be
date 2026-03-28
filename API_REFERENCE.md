@@ -93,14 +93,32 @@ Response `200`: `UserDto.Response`
 
 ### PUT `/api/users/{id}`
 Path param: `id` (Long)
-Request body (co the gui 1 hoac ca 2 field):
+Request body (co the gui 1 hoac nhieu field):
 ```json
 {
   "fullName": "Nguyen Van B",
-  "status": "INACTIVE"
+  "status": "INACTIVE",
+  "img": "https://avatar-url.com/image.jpg"
 }
 ```
 Response `200`: `UserDto.Response`
+
+### PUT `/api/users/{id}/password`
+Path param: `id` (Long)
+Request body:
+```json
+{
+  "oldPassword": "old_password_here",
+  "newPassword": "new_password_here"
+}
+```
+Response `200` (khong body)
+
+### POST `/api/users/{id}/avatar`
+Path param: `id` (Long)
+Request form-data:
+- `file` (MultipartFile): File ảnh đại diện cần upload.
+Response `200`: `UserDto.Response` (User có thông tin `img` mới được upload)
 
 ### DELETE `/api/users/{id}`
 Path param: `id` (Long)

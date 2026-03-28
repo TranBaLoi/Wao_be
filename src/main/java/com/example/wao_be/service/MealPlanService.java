@@ -105,6 +105,10 @@ public class MealPlanService {
     }
 
     public MealPlanDto.ApplyResponse applyToDate(Long mealPlanId, MealPlanDto.ApplyRequest req) {
+        if (mealPlanId == 0) {
+            return applyTransientPlanToDate(req);
+        }
+
         MealPlan mealPlan = findById(mealPlanId);
         User user = userService.findById(req.getUserId());
         LocalDate logDate = req.getLogDate();
@@ -144,6 +148,41 @@ public class MealPlanService {
         res.setPreviousItems(previousCount);
         res.setAddedItems(logs.size());
         res.setMessage("Applied meal plan successfully.");
+        return res;
+    }
+
+    private MealPlanDto.ApplyResponse applyTransientPlanToDate(MealPlanDto.ApplyRequest req) {
+        if (req.getTransientFoods() == null || req.getTransientFoods().isEmpty()) {
+            throw new IllegalArgumentException("Transient foods must be provided when applying a plan directly (id=0).");
+        }
+
+        User user = userService.findById(req.getUserId());
+        LocalDate logDate = req.getLogDate();
+
+        int previousCount = userFoodLogRepository.findByUserIdAndLogDate(user.getId(), logDate).size();
+        userFoodLogRepository.deleteByUserIdAndLogDate(user.getId(), logDate);
+
+        var logs = req.getTransientFoods().stream()
+                .map(item -> UserFoodLog.builder()
+                        .user(user)
+                        .food(foodService.findById(item.getFoodId()))
+                        .mealType(item.getMealType())
+                        .servingQty(item.getServingQty())
+                        .totalCalories(0.0)
+                        .logDate(logDate)
+                        .build())
+                .toList();
+
+        userFoodLogRepository.saveAll(logs);
+        dailySummaryService.buildAndSave(user.getId(), logDate);
+
+        MealPlanDto.ApplyResponse res = new MealPlanDto.ApplyResponse();
+        res.setMealPlanId(0L);
+        res.setUserId(user.getId());
+        res.setLogDate(logDate);
+        res.setPreviousItems(previousCount);
+        res.setAddedItems(logs.size());
+        res.setMessage("Applied transient meal plan successfully.");
         return res;
     }
 

@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -103,11 +105,15 @@ public class AiRecommendationService {
             throw new RuntimeException("Cannot find any safe candidate food for " + mealType + " after allergy filtering");
         }
 
-        candidates.sort((f1, f2) -> {
-            double s1 = VectorUtils.cosineSimilarity(userVector, VectorUtils.parseVector(f1.getFeatureVector()));
-            double s2 = VectorUtils.cosineSimilarity(userVector, VectorUtils.parseVector(f2.getFeatureVector()));
-            return Double.compare(s2, s1);
-        });
+        Map<Food, Double> scoredFoods = new HashMap<>();
+        for (Food food : candidates) {
+            double baseScore = VectorUtils.cosineSimilarity(userVector, VectorUtils.parseVector(food.getFeatureVector()));
+            double noise = Math.random() * 0.15;
+            double finalScore = baseScore + noise;
+            scoredFoods.put(food, finalScore);
+        }
+
+        candidates.sort((f1, f2) -> Double.compare(scoredFoods.get(f2), scoredFoods.get(f1)));
 
         List<Food> combo = new ArrayList<>();
         double currentCalo = 0.0;

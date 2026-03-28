@@ -17,6 +17,19 @@ public class ImageStorageService {
 
     private final Cloudinary cloudinary;
 
+    public String uploadAvatar(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) return null;
+
+        Map uploadResult = cloudinary.uploader().upload(
+                file.getBytes(),
+                ObjectUtils.asMap(
+                        "folder",        "avatars",
+                        "resource_type", "image"
+                )
+        );
+        return (String) uploadResult.get("secure_url");
+    }
+
     public List<String> uploadImages(List<MultipartFile> files) throws IOException {
         List<String> urls = new ArrayList<>();
 

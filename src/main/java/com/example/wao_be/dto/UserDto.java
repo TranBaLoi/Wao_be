@@ -24,6 +24,16 @@ public class UserDto {
     public static class UpdateRequest {
         private String fullName;
         private User.UserStatus status;
+        private String img;
+    }
+
+    @Data
+    public static class ChangePasswordRequest {
+        @NotBlank
+        private String oldPassword;
+
+        @NotBlank @Size(min = 6, max = 100)
+        private String newPassword;
     }
 
     @Data

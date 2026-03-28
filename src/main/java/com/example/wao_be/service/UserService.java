@@ -141,6 +141,22 @@ public class UserService {
         User user = findById(id);
         if (req.getFullName() != null) user.setFullName(req.getFullName());
         if (req.getStatus() != null) user.setStatus(req.getStatus());
+        if (req.getImg() != null) user.setImg(req.getImg());
+        return toResponse(userRepository.save(user));
+    }
+
+    public void changePassword(Long id, UserDto.ChangePasswordRequest req) {
+        User user = findById(id);
+        if (!user.getPasswordHash().equals(req.getOldPassword())) {
+            throw new IllegalArgumentException("Old password does not match");
+        }
+        user.setPasswordHash(req.getNewPassword());
+        userRepository.save(user);
+    }
+
+    public UserDto.Response updateAvatarUrl(Long id, String avatarUrl) {
+        User user = findById(id);
+        user.setImg(avatarUrl);
         return toResponse(userRepository.save(user));
     }
 

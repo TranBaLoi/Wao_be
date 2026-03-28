@@ -74,11 +74,14 @@ public class MealPlanDto {
 
         @NotNull
         private LocalDate logDate;
+
+        // Tùy chọn truyền danh sách món khi apply trực tiếp không qua plan lưu sẵn (vd: id = 0)
+        private List<Request.FoodItem> transientFoods;
     }
 
     @Data
     public static class ApplyResponse {
-        private Long mealPlanId;
+        private Long mealPlanId; // sẽ trả về 0 nếu plan tạm
         private Long userId;
         private LocalDate logDate;
         private Integer previousItems;
