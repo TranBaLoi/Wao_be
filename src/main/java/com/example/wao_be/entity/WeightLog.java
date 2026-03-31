@@ -2,7 +2,6 @@ package com.example.wao_be.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -41,12 +40,16 @@ public class WeightLog {
     private String note;
 
     // thời điểm log
-    @CreationTimestamp
+    //namthem
     @Column(name = "logged_at", updatable = false)
     private LocalDateTime loggedAt;
 
     @PrePersist
     public void calculateChange() {
+        //namthem
+        if (loggedAt == null) {
+            loggedAt = LocalDateTime.now();
+        }
         if (oldWeight != null && newWeight != null) {
             changeAmount = newWeight - oldWeight;
         }

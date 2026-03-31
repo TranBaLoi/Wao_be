@@ -64,4 +64,36 @@ public class StatisticsDto {
         private Double overallChange;
         private List<WeightPoint> points;
     }
+
+    //namthem
+    @Data
+    public static class CreateWeightLogRequest {
+        private LocalDate date;
+        private Double newWeight;
+        private String note;
+    }
+
+    //namthem
+    @Data
+    public static class WeightLogUpdateResponse {
+        private Long logId;
+        private Long userId;
+        private LocalDate date;
+        private Double oldWeight;
+        private Double newWeight;
+        private Double changeAmount;
+        private Double currentProfileWeight;
+        private String note;
+        private Double latestKnownWeight;
+        private LocalDate latestKnownDate;
+    }
+
+    //namthem
+    @Data
+    public static class LatestWeightInfoResponse {
+        private Long userId;
+        private Double latestKnownWeight;
+        private LocalDate latestKnownDate;
+        private String source;
+    }
 }
