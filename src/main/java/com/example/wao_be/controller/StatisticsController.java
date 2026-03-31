@@ -8,6 +8,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,5 +46,20 @@ public class StatisticsController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @RequestParam(defaultValue = "DAY") StatisticsDto.GroupBy groupBy) {
         return ResponseEntity.ok(statisticsService.getWeightSeries(userId, from, to, groupBy));
+    }
+
+    //namthem
+    @GetMapping("/weight/latest")
+    public ResponseEntity<StatisticsDto.LatestWeightInfoResponse> getLatestWeightInfo(
+            @PathVariable Long userId) {
+        return ResponseEntity.ok(statisticsService.getLatestWeightInfo(userId));
+    }
+
+    //namthem
+    @PostMapping("/weight/logs")
+    public ResponseEntity<StatisticsDto.WeightLogUpdateResponse> createWeightLog(
+            @PathVariable Long userId,
+            @RequestBody StatisticsDto.CreateWeightLogRequest request) {
+        return ResponseEntity.ok(statisticsService.createWeightLog(userId, request));
     }
 }
