@@ -49,6 +49,8 @@ Tat ca loi duoc tra theo format tu `GlobalExceptionHandler`:
 - `MealType`: `BREAKFAST`, `LUNCH`, `DINNER`, `SNACK`
 - `MealPlanType`: `SYSTEM_SUGGESTION`, `USER_CUSTOM`
 - `ProgramLevel`: `BEGINNER`, `INTERMEDIATE`, `PRO`
+- `WorkoutActivityType`: `OUTDOOR_WALKING`, `OUTDOOR_RUNNING`, `INDOOR_RUNNING`, `OUTDOOR_CYCLING`, `OTHER`
+- `WorkoutDataSource`: `GPS`, `HEALTH_CONNECT`, `SENSOR`, `ESTIMATED`, `MANUAL`
 
 ## 3) Users API
 
@@ -487,18 +489,117 @@ Request body (tap theo program):
   "note": "Theo giao an"
 }
 ```
-Response `201`: `WorkoutLogDto.Response`
+Request body (tracking tu mobile):
+```json
+{
+  "activityType": "OUTDOOR_RUNNING",
+  "distanceMeters": 5320.4,
+  "avgSpeedKmh": 9.6,
+  "maxSpeedKmh": 13.2,
+  "avgHeartRate": 148,
+  "maxHeartRate": 172,
+  "caloriesBurned": 382.4,
+  "caloriesSource": "HEALTH_CONNECT",
+  "distanceSource": "GPS",
+  "heartRateSource": "HEALTH_CONNECT",
+  "startedAt": "2026-03-21T06:10:00",
+  "endedAt": "2026-03-21T06:43:00",
+  "note": "Morning run"
+}
+```
+Response `201`:
+```json
+{
+  "id": 301,
+  "userId": 1,
+  "exerciseId": null,
+  "exerciseName": null,
+  "programId": null,
+  "programName": null,
+  "activityType": "OUTDOOR_RUNNING",
+  "durationMin": 33,
+  "caloriesBurned": 382.4,
+  "distanceMeters": 5320.4,
+  "avgSpeedKmh": 9.6,
+  "maxSpeedKmh": 13.2,
+  "stepCount": null,
+  "avgHeartRate": 148,
+  "maxHeartRate": 172,
+  "caloriesSource": "HEALTH_CONNECT",
+  "distanceSource": "GPS",
+  "heartRateSource": "HEALTH_CONNECT",
+  "logDate": "2026-03-21",
+  "startedAt": "2026-03-21T06:10:00",
+  "endedAt": "2026-03-21T06:43:00",
+  "note": "Morning run"
+}
+```
 
-Rule: phai co it nhat 1 trong 2 field `exerciseId` hoac `programId`.
+Official request/response fields:
+- `exerciseId` (Long, optional): ID bai tap le.
+- `programId` (Long, optional): ID workout program.
+- `activityType` (Enum, optional): loai workout tracking cho mobile.
+- `durationMin` (Integer, optional neu co `startedAt` + `endedAt`): thoi luong workout tinh theo phut.
+- `caloriesBurned` (Double, optional): luong calories workout.
+- `distanceMeters` (Double, optional): tong quang duong.
+- `avgSpeedKmh` (Double, optional): toc do trung binh.
+- `maxSpeedKmh` (Double, optional): toc do toi da.
+- `stepCount` (Integer, optional): tong so buoc chan cua workout.
+- `avgHeartRate` (Integer, optional): nhip tim trung binh.
+- `maxHeartRate` (Integer, optional): nhip tim toi da.
+- `caloriesSource` (Enum, optional): nguon calories.
+- `distanceSource` (Enum, optional): nguon distance.
+- `heartRateSource` (Enum, optional): nguon heart rate.
+- `logDate` (LocalDate, optional neu co `startedAt`): ngay workout.
+- `startedAt` (LocalDateTime, optional): thoi diem bat dau workout.
+- `endedAt` (LocalDateTime, optional): thoi diem ket thuc workout.
+- `note` (String, optional): ghi chu tu do.
+
+Validation rules:
+- Phai co it nhat 1 trong 3 field `exerciseId`, `programId`, `activityType`.
+- Khong duoc gui dong thoi `exerciseId` va `programId`.
+- `durationMin` > 0 neu duoc gui.
+- Neu khong gui `durationMin` thi bat buoc gui ca `startedAt` va `endedAt`; backend se tu suy ra `durationMin`.
+- Neu khong gui `logDate` thi bat buoc gui `startedAt`; backend se lay `logDate = startedAt.toLocalDate()`.
+- `startedAt` va `endedAt` phai di cung nhau; `endedAt` phai lon hon `startedAt`.
+- `distanceMeters`, `avgSpeedKmh`, `maxSpeedKmh`, `stepCount`, `caloriesBurned` >= 0 neu duoc gui.
+- `avgHeartRate`, `maxHeartRate` trong khoang `1..300` neu duoc gui.
+- `avgSpeedKmh` khong duoc lon hon `maxSpeedKmh`.
+- `avgHeartRate` khong duoc lon hon `maxHeartRate`.
+- Neu gui tracking metrics (`distance/speed/steps/heartRate/startedAt/endedAt`) thi bat buoc co `activityType`.
+
+Backward compatibility:
+- Mobile cu van co the gui request cu chi gom `exerciseId/programId`, `durationMin`, `caloriesBurned`, `logDate`, `note`.
+- Tat ca field tracking moi deu optional.
+- Neu `caloriesBurned` co gia tri nhung khong gui `caloriesSource`, backend mac dinh `ESTIMATED`.
+- Neu `distanceMeters` co gia tri nhung khong gui `distanceSource`, backend mac dinh `MANUAL`.
+- Neu co heart rate nhung khong gui `heartRateSource`, backend mac dinh `MANUAL`.
 
 ### GET `/api/users/{userId}/workout-logs?date=yyyy-MM-dd`
 Path param: `userId`
 Query param: `date`
 Response `200`: `WorkoutLogDto.Response[]`
 
+Response tra day du tat ca field moi cua workout log, bao gom:
+- `activityType`
+- `distanceMeters`
+- `avgSpeedKmh`
+- `maxSpeedKmh`
+- `stepCount`
+- `avgHeartRate`
+- `maxHeartRate`
+- `caloriesSource`
+- `distanceSource`
+- `heartRateSource`
+- `startedAt`
+- `endedAt`
+
 ### DELETE `/api/users/{userId}/workout-logs/{logId}`
 Path param: `userId`, `logId`
 Response `204`
+
+Implementation note:
+- Repository da bo sung aggregate helper cho `distanceMeters`, `stepCount`, va calories/distance theo `WorkoutDataSource` de phuc vu daily summary/statistics o phase tiep theo.
 
 ## 11) Step Logs API
 

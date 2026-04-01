@@ -8,7 +8,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,17 +28,15 @@ public class WorkoutLogController {
     private final WorkoutLogService workoutLogService;
     private final DailySummaryService dailySummaryService;
 
-    /** POST /api/users/{userId}/workout-logs */
     @PostMapping
     public ResponseEntity<WorkoutLogDto.Response> log(
             @PathVariable Long userId,
             @Valid @RequestBody WorkoutLogDto.Request req) {
         WorkoutLogDto.Response response = workoutLogService.log(userId, req);
-        dailySummaryService.buildAndSave(userId, req.getLogDate());
+        dailySummaryService.buildAndSave(userId, response.getLogDate());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /** GET /api/users/{userId}/workout-logs?date=yyyy-MM-dd */
     @GetMapping
     public ResponseEntity<List<WorkoutLogDto.Response>> getByDate(
             @PathVariable Long userId,
@@ -39,13 +44,11 @@ public class WorkoutLogController {
         return ResponseEntity.ok(workoutLogService.getByUserAndDate(userId, date));
     }
 
-    /** DELETE /api/users/{userId}/workout-logs/{logId} */
     @DeleteMapping("/{logId}")
     public ResponseEntity<Void> delete(@PathVariable Long userId,
                                        @PathVariable Long logId) {
-        workoutLogService.delete(logId);
-        dailySummaryService.buildAndSave(userId, LocalDate.now());
+        LocalDate deletedLogDate = workoutLogService.delete(userId, logId);
+        dailySummaryService.buildAndSave(userId, deletedLogDate);
         return ResponseEntity.noContent().build();
     }
 }
-

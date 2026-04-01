@@ -1,0 +1,13 @@
+ALTER TABLE user_workout_logs
+    ADD COLUMN activity_type ENUM ('INDOOR_RUNNING', 'OTHER', 'OUTDOOR_CYCLING', 'OUTDOOR_RUNNING', 'OUTDOOR_WALKING') NULL,
+    ADD COLUMN distance_meters DOUBLE NULL,
+    ADD COLUMN avg_speed_kmh DOUBLE NULL,
+    ADD COLUMN max_speed_kmh DOUBLE NULL,
+    ADD COLUMN step_count INT NULL,
+    ADD COLUMN avg_heart_rate INT NULL,
+    ADD COLUMN max_heart_rate INT NULL,
+    ADD COLUMN calories_source ENUM ('ESTIMATED', 'GPS', 'HEALTH_CONNECT', 'MANUAL', 'SENSOR') NULL,
+    ADD COLUMN distance_source ENUM ('ESTIMATED', 'GPS', 'HEALTH_CONNECT', 'MANUAL', 'SENSOR') NULL,
+    ADD COLUMN heart_rate_source ENUM ('ESTIMATED', 'GPS', 'HEALTH_CONNECT', 'MANUAL', 'SENSOR') NULL,
+    ADD COLUMN started_at DATETIME NULL,
+    ADD COLUMN ended_at DATETIME NULL;
