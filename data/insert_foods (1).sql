@@ -124,3 +124,26 @@ INSERT INTO food (name, serving_size, calories, protein, carbs, fat, is_verified
 ('Thịt gà xào gừng', '1 phần (250g)', 340, 30, 8, 20, 1, '0.2, 0.3, 0.5', 'BREAKFAST,LUNCH,DINNER', 'thịt gà, gừng, hành tây, nước mắm, dầu ăn', ''),
 ('Chả lụa hấp', '1 phần (100g)', 200, 16, 5, 13, 1, '0.1, 0.8, 0.6', 'BREAKFAST,LUNCH,DINNER', 'thịt heo, bột năng, nước mắm, tiêu', ''),
 ('Bông cải xào tôm', '1 đĩa (250g)', 200, 16, 12, 8, 1, '0.8, 1.0, 0.1', 'BREAKFAST,LUNCH,DINNER', 'bông cải xanh, tôm, tỏi, dầu ăn, muối', 'SEAFOOD');
+
+
+INSERT INTO food_images (food_id, image_url) VALUES
+(7, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015372/trung-op-la_bwxjwl.jpg'),
+(16, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015371/thit-kho-trung_nhik8v.jpg'),
+(6, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015371/salad-uc-ga_wvskzu.jpg'),
+(2, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015370/pho-b%C3%B2_bbb22c.jpg'),
+(9, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015369/mi-xao-bo_nsyavx.jpg'),
+(35, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015368/mi-ramen_lserh0.jpg'),
+(25, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015367/lau-thai_wbdznm.jpg'),
+(14, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015367/goi-cuon_jdyuj4.jpg'),
+(4, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015366/com-tam-suon_uila8q.jpg'),
+(26, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015365/com-ga-xoi-mo_hg6rag.jpg'),
+(11, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015365/com-chien-trung_ntbtvc.jpg'),
+(12, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015364/chao-ga_metdgb.jpg'),
+(40, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015364/bun-thit-nuong_ajovia.jpg'),
+(13, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015362/banh-xeo_yetqvk.jpg'),
+(33, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015362/bun-rieu-cua_btgybo.jpg'),
+(3, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015362/bun-cha_cwtzo3.jpg'),
+(10, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015361/bun-bo-hue_r91til.jpg'),
+(24, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015361/banh-cu%E1%BB%91n_qk16rp.jpg'),
+(27, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015360/banh-canh-cua_k9ky6h.jpg'),
+(5, 'https://res.cloudinary.com/du5pmld46/image/upload/v1775015359/banh-mi-thit_aehilh.jpg');

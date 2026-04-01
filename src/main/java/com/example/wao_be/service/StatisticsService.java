@@ -33,10 +33,12 @@ public class StatisticsService {
     private final UserHealthProfileRepository userHealthProfileRepository;
     private final UserService userService;
 
+    // tổng hợp toàn bộ dinh dưỡng trong 1 ngày
     public StatisticsDto.DailyNutritionResponse getDailyNutrition(Long userId, LocalDate date) {
         userService.findById(userId);
 
         NutritionAccumulator accumulator = new NutritionAccumulator();
+        // add tất cả log lại vào accymulator
         userFoodLogRepository.findByUserIdAndLogDate(userId, date)
                 .forEach(accumulator::add);
 
@@ -50,6 +52,7 @@ public class StatisticsService {
         return response;
     }
 
+    // thốn kê dinh dưỡng cho nhiều ngày, có thể group theo ngày, tuần, tháng
     public StatisticsDto.NutritionSeriesResponse getNutritionSeries(
             Long userId,
             LocalDate from,
@@ -91,6 +94,60 @@ public class StatisticsService {
         return response;
     }
 
+    private Map<LocalDate, NutritionAccumulator> initNutritionBuckets(
+            LocalDate from,
+            LocalDate to,
+            StatisticsDto.GroupBy groupBy) {
+        Map<LocalDate, NutritionAccumulator> buckets = new LinkedHashMap<>();
+        LocalDate cursor = bucketDate(from, groupBy);
+        LocalDate endBucket = bucketDate(to, groupBy);
+
+        while (!cursor.isAfter(endBucket)) {
+            buckets.put(cursor, new NutritionAccumulator());
+            cursor = nextBucket(cursor, groupBy);
+        }
+        return buckets;
+    }
+
+    private LocalDate bucketDate(LocalDate date, StatisticsDto.GroupBy groupBy) {
+        return switch (groupBy) {
+            case DAY -> date;
+            case WEEK -> date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            case MONTH -> date.withDayOfMonth(1);
+        };
+    }
+
+    private LocalDate nextBucket(LocalDate bucketDate, StatisticsDto.GroupBy groupBy) {
+        return switch (groupBy) {
+            case DAY -> bucketDate.plusDays(1);
+            case WEEK -> bucketDate.plusWeeks(1);
+            case MONTH -> bucketDate.plusMonths(1);
+        };
+    }
+
+    // cộng dinh dưỡng từng món ăn 1
+    private class NutritionAccumulator {
+        private double totalCalories;
+        private double totalProtein;
+        private double totalCarbs;
+        private double totalFat;
+
+        private void add(UserFoodLog log) {
+            double servingQty = safe(log.getServingQty());
+            totalCalories += safe(log.getTotalCalories());
+            totalProtein += safe(log.getFood().getProtein()) * servingQty;
+            totalCarbs += safe(log.getFood().getCarbs()) * servingQty;
+            totalFat += safe(log.getFood().getFat()) * servingQty;
+        }
+
+        private void merge(NutritionAccumulator other) {
+            totalCalories += other.totalCalories;
+            totalProtein += other.totalProtein;
+            totalCarbs += other.totalCarbs;
+            totalFat += other.totalFat;
+        }
+    }
+
     public StatisticsDto.WeightSeriesResponse getWeightSeries(
             Long userId,
             LocalDate from,
@@ -100,7 +157,10 @@ public class StatisticsService {
         validateRange(from, to);
 
         LocalDateTime fromDateTime = from.atStartOfDay();
-        LocalDateTime toDateTime = to.plusDays(1).atStartOfDay().minusNanos(1);
+        LocalDateTime toDateTime = to.atStartOfDay()
+                .plusHours(23)
+                .plusMinutes(59)
+                .plusSeconds(59);
 
         // nam them: can nang luon tra ve theo tung ngay, lay newWeight moi nhat cua
         // ngay do
@@ -143,10 +203,12 @@ public class StatisticsService {
         response.setGroupBy(StatisticsDto.GroupBy.DAY);
         response.setOverallChange(firstWeight != null && lastWeight != null ? lastWeight - firstWeight : null);
         response.setPoints(points);
+        System.out.println("response: " + response);
         return response;
     }
 
-    //namthem
+    // thêm phần này để lấy cân nặng gần nhất của user, có thể là từ health profile
+    // hoặc log
     public StatisticsDto.LatestWeightInfoResponse getLatestWeightInfo(Long userId) {
         userService.findById(userId);
         UserHealthProfile latestProfile = userHealthProfileRepository
@@ -163,6 +225,13 @@ public class StatisticsService {
         return response;
     }
 
+    // tính cân nặng gần nhất
+    private record LatestKnownWeightInfo(
+            Double weight,
+            LocalDate date,
+            String source) {
+    }
+
     // namthem
     @Transactional
     public StatisticsDto.WeightLogUpdateResponse createWeightLog(
@@ -175,7 +244,7 @@ public class StatisticsService {
         if (request.getNewWeight() <= 0) {
             throw new IllegalArgumentException("newWeight must be greater than 0");
         }
-        //namthem
+        // namthem
         if (!LocalDate.now().equals(request.getDate())) {
             throw new IllegalArgumentException("Chỉ được cập nhật cân nặng cho ngày hiện tại.");
         }
@@ -189,7 +258,7 @@ public class StatisticsService {
         validateWeightThreshold(request.getNewWeight(), latestKnown);
 
         LocalDateTime loggedAt = request.getDate().atStartOfDay();
-        //namthem
+        // namthem
         if (weightLogRepository.existsByUserIdAndLoggedAtBetween(
                 userId,
                 loggedAt,
@@ -216,17 +285,18 @@ public class StatisticsService {
         WeightLog savedWeightLog = weightLogRepository.save(weightLog);
 
         try {
-            //namthem
+            // namthem
             latestProfile.setWeightKg(request.getNewWeight());
             userHealthProfileRepository.save(latestProfile);
         } catch (IllegalArgumentException ex) {
-            //namthem
+            // namthem
             throw new IllegalArgumentException(
                     "Da ghi log can nang, nhung khong dong bo duoc ho so suc khoe: " + ex.getMessage(), ex);
         } catch (Exception ex) {
-            //namthem
+            // namthem
             throw new IllegalArgumentException(
-                    "Da ghi log can nang, nhung cap nhat ho so suc khoe that bai. Vui long kiem tra muc tieu can nang hien tai.", ex);
+                    "Da ghi log can nang, nhung cap nhat ho so suc khoe that bai. Vui long kiem tra muc tieu can nang hien tai.",
+                    ex);
         }
 
         StatisticsDto.WeightLogUpdateResponse response = new StatisticsDto.WeightLogUpdateResponse();
@@ -243,21 +313,6 @@ public class StatisticsService {
         return response;
     }
 
-    private Map<LocalDate, NutritionAccumulator> initNutritionBuckets(
-            LocalDate from,
-            LocalDate to,
-            StatisticsDto.GroupBy groupBy) {
-        Map<LocalDate, NutritionAccumulator> buckets = new LinkedHashMap<>();
-        LocalDate cursor = bucketDate(from, groupBy);
-        LocalDate endBucket = bucketDate(to, groupBy);
-
-        while (!cursor.isAfter(endBucket)) {
-            buckets.put(cursor, new NutritionAccumulator());
-            cursor = nextBucket(cursor, groupBy);
-        }
-        return buckets;
-    }
-
     private Map<LocalDate, WeightAccumulator> initWeightBuckets(
             LocalDate from,
             LocalDate to) {
@@ -270,22 +325,6 @@ public class StatisticsService {
             cursor = cursor.plusDays(1);
         }
         return buckets;
-    }
-
-    private LocalDate bucketDate(LocalDate date, StatisticsDto.GroupBy groupBy) {
-        return switch (groupBy) {
-            case DAY -> date;
-            case WEEK -> date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-            case MONTH -> date.withDayOfMonth(1);
-        };
-    }
-
-    private LocalDate nextBucket(LocalDate bucketDate, StatisticsDto.GroupBy groupBy) {
-        return switch (groupBy) {
-            case DAY -> bucketDate.plusDays(1);
-            case WEEK -> bucketDate.plusWeeks(1);
-            case MONTH -> bucketDate.plusMonths(1);
-        };
     }
 
     private void validateRange(LocalDate from, LocalDate to) {
@@ -301,7 +340,7 @@ public class StatisticsService {
         return value != null ? value : 0.0;
     }
 
-    //namthem
+    // namthem
     private LatestKnownWeightInfo resolveLatestKnownWeightInfo(Long userId, UserHealthProfile latestProfile) {
         return weightLogRepository.findFirstByUserIdOrderByLoggedAtDesc(userId)
                 .map(log -> new LatestKnownWeightInfo(
@@ -314,7 +353,7 @@ public class StatisticsService {
                         "HEALTH_PROFILE"));
     }
 
-    //namthem
+    // namthem
     private void validateWeightThreshold(Double newWeight, LatestKnownWeightInfo latestKnown) {
         if (newWeight == null || latestKnown.weight() == null) {
             return;
@@ -335,13 +374,14 @@ public class StatisticsService {
         }
     }
 
-    //namthem
+    // thêm ngưỡng
     private double resolveAllowedWeightDelta(LocalDate latestKnownDate) {
         if (latestKnownDate == null) {
             return 8.0;
         }
 
-        long daysSinceLastLog = Math.max(0, Duration.between(latestKnownDate.atStartOfDay(), LocalDate.now().atStartOfDay()).toDays());
+        long daysSinceLastLog = Math.max(0,
+                Duration.between(latestKnownDate.atStartOfDay(), LocalDate.now().atStartOfDay()).toDays());
         if (daysSinceLastLog <= 30) {
             return 5.0;
         }
@@ -354,35 +394,8 @@ public class StatisticsService {
         return 18.0;
     }
 
-    //namthem
-    private record LatestKnownWeightInfo(
-            Double weight,
-            LocalDate date,
-            String source) {
-    }
-
-    private class NutritionAccumulator {
-        private double totalCalories;
-        private double totalProtein;
-        private double totalCarbs;
-        private double totalFat;
-
-        private void add(UserFoodLog log) {
-            double servingQty = safe(log.getServingQty());
-            totalCalories += safe(log.getTotalCalories());
-            totalProtein += safe(log.getFood().getProtein()) * servingQty;
-            totalCarbs += safe(log.getFood().getCarbs()) * servingQty;
-            totalFat += safe(log.getFood().getFat()) * servingQty;
-        }
-
-        private void merge(NutritionAccumulator other) {
-            totalCalories += other.totalCalories;
-            totalProtein += other.totalProtein;
-            totalCarbs += other.totalCarbs;
-            totalFat += other.totalFat;
-        }
-    }
-
+    // tính sự chênh lệnh cân nặng theo ngày, có thể có nhiều log trong ngày, lấy
+    // log đầu tiên làm startWeight, log cuối cùng làm endWeight
     private static class WeightAccumulator {
         private Double startWeight;
         private Double endWeight;
