@@ -1,16 +1,20 @@
 package com.example.wao_be.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -38,6 +42,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleUnreadableMessage(HttpMessageNotReadableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), resolveReadableMessage(ex)));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -55,6 +65,36 @@ public class GlobalExceptionHandler {
         public ErrorResponse(int status, String message, Map<String, String> fieldErrors) {
             this(status, message, fieldErrors, LocalDateTime.now());
         }
+    }
+
+    private String resolveReadableMessage(HttpMessageNotReadableException ex) {
+        Throwable cause = ex.getMostSpecificCause();
+        if (cause instanceof InvalidFormatException invalidFormatException) {
+            String fieldName = invalidFormatException.getPath().isEmpty()
+                    ? null
+                    : invalidFormatException.getPath().get(invalidFormatException.getPath().size() - 1).getFieldName();
+            Object invalidValue = invalidFormatException.getValue();
+            Class<?> targetType = invalidFormatException.getTargetType();
+
+            if (targetType != null && targetType.isEnum()) {
+                String supportedValues = Arrays.stream(targetType.getEnumConstants())
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(", "));
+                if (fieldName != null && !fieldName.isBlank()) {
+                    return "Invalid " + fieldName + ": " + invalidValue + ". Supported values: " + supportedValues;
+                }
+                return "Invalid enum value: " + invalidValue + ". Supported values: " + supportedValues;
+            }
+
+            if (fieldName != null && !fieldName.isBlank()) {
+                return "Invalid value for " + fieldName + ": " + invalidValue;
+            }
+        }
+
+        if (cause != null && cause.getMessage() != null && !cause.getMessage().isBlank()) {
+            return cause.getMessage();
+        }
+        return "Malformed JSON request.";
     }
 }
 

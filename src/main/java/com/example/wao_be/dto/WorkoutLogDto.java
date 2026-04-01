@@ -13,11 +13,18 @@ import java.time.LocalDateTime;
 
 public class WorkoutLogDto {
 
+    public enum SummaryGroupType {
+        EXERCISE,
+        PROGRAM,
+        ACTIVITY
+    }
+
     @Data
     public static class Request {
         private Long exerciseId;
         private Long programId;
         private ActivityType activityType;
+        private ActivityType workoutType;
 
         @Positive
         private Integer durationMin;
@@ -47,6 +54,7 @@ public class WorkoutLogDto {
 
         private WorkoutDataSource caloriesSource;
         private WorkoutDataSource distanceSource;
+        private WorkoutDataSource stepSource;
         private WorkoutDataSource heartRateSource;
         private LocalDate logDate;
         private LocalDateTime startedAt;
@@ -63,6 +71,7 @@ public class WorkoutLogDto {
         private Long programId;
         private String programName;
         private ActivityType activityType;
+        private ActivityType workoutType;
         private Integer durationMin;
         private Double caloriesBurned;
         private Double distanceMeters;
@@ -73,10 +82,31 @@ public class WorkoutLogDto {
         private Integer maxHeartRate;
         private WorkoutDataSource caloriesSource;
         private WorkoutDataSource distanceSource;
+        private WorkoutDataSource stepSource;
         private WorkoutDataSource heartRateSource;
         private LocalDate logDate;
         private LocalDateTime startedAt;
         private LocalDateTime endedAt;
         private String note;
+        private LocalDateTime createdAt;
+    }
+
+    @Data
+    public static class SummaryResponse {
+        private SummaryGroupType groupType;
+        private String groupKey;
+        private String displayName;
+        private Long exerciseId;
+        private String exerciseName;
+        private Long programId;
+        private String programName;
+        private ActivityType activityType;
+        private ActivityType workoutType;
+        private Integer totalSessions;
+        private Integer totalDurationMin;
+        private Double totalCaloriesBurned;
+        private Double totalDistanceMeters;
+        private Integer totalStepCount;
+        private LocalDateTime lastSessionAt;
     }
 }

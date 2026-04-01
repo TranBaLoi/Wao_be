@@ -44,6 +44,22 @@ public class WorkoutLogController {
         return ResponseEntity.ok(workoutLogService.getByUserAndDate(userId, date));
     }
 
+    @GetMapping("/history")
+    public ResponseEntity<List<WorkoutLogDto.Response>> getHistory(
+            @PathVariable Long userId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return ResponseEntity.ok(workoutLogService.getByUserAndDateRange(userId, from, to));
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<List<WorkoutLogDto.SummaryResponse>> getSummary(
+            @PathVariable Long userId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return ResponseEntity.ok(workoutLogService.getSummary(userId, from, to));
+    }
+
     @DeleteMapping("/{logId}")
     public ResponseEntity<Void> delete(@PathVariable Long userId,
                                        @PathVariable Long logId) {

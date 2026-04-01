@@ -22,6 +22,7 @@ public class WorkoutLogMapper {
         response.setMaxHeartRate(log.getMaxHeartRate());
         response.setCaloriesSource(log.getCaloriesSource());
         response.setDistanceSource(log.getDistanceSource());
+        response.setStepSource(log.getStepSource());
         response.setHeartRateSource(log.getHeartRateSource());
         response.setLogDate(log.getLogDate());
         response.setStartedAt(log.getStartedAt());
@@ -35,6 +36,8 @@ public class WorkoutLogMapper {
             response.setProgramId(log.getProgram().getId());
             response.setProgramName(log.getProgram().getName());
         }
+        response.setWorkoutType(log.getActivityType());
+        response.setCreatedAt(log.getCreatedAt());
         return response;
     }
 }

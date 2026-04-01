@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -84,6 +85,10 @@ public class UserWorkoutLog {
     private WorkoutDataSource distanceSource;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "step_source", length = 30)
+    private WorkoutDataSource stepSource;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "heart_rate_source", length = 30)
     private WorkoutDataSource heartRateSource;
 
@@ -99,6 +104,10 @@ public class UserWorkoutLog {
     @Column(columnDefinition = "TEXT")
     private String note;
 
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
     @PrePersist
     @PreUpdate
     public void computeCaloriesBurned() {
@@ -112,6 +121,7 @@ public class UserWorkoutLog {
         OUTDOOR_WALKING,
         OUTDOOR_RUNNING,
         INDOOR_RUNNING,
+        CYCLING,
         OUTDOOR_CYCLING,
         OTHER
     }
