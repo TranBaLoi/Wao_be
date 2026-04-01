@@ -8,11 +8,19 @@ import com.example.wao_be.entity.Food;
 import com.example.wao_be.entity.MealPlan;
 import com.example.wao_be.entity.User;
 import com.example.wao_be.entity.UserFoodLog;
+import com.example.wao_be.entity.UserHealthProfile;
+import com.example.wao_be.entity.UserWorkoutLog;
+import com.example.wao_be.entity.WeightLog;
 import com.example.wao_be.repository.ChatConversationRepository;
 import com.example.wao_be.repository.ChatMessageRepository;
 import com.example.wao_be.repository.FoodRepository;
 import com.example.wao_be.repository.MealPlanRepository;
 import com.example.wao_be.repository.UserFoodLogRepository;
+import com.example.wao_be.repository.UserHealthProfileRepository;
+import com.example.wao_be.repository.UserWaterLogRepository;
+import com.example.wao_be.repository.UserWorkoutLogRepository;
+import com.example.wao_be.repository.WeightLogRepository;
+import com.example.wao_be.repository.StepLogRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,20 +39,21 @@ import java.util.List;
 public class ChatbotService {
 
     private static final String DEFAULT_SYSTEM_PROMPT = "You are the AI assistant for the Wao nutrition tracking app. " +
-            "You can answer topics related to diet, calories, meal planning, food logging, hydration, healthy habits, and basic cooking/recipes. " +
-            "If the topic is unrelated to food or cooking, refuse and say you can only help with nutrition and cooking questions. " +
-            "When helpful, suggest using app features like food log, meal plan, daily summary, or water log. " +
+            "You can answer topics related to diet, calories, meal planning, food logging, hydration, healthy habits, workouts, weight tracking, and basic cooking/recipes. " +
+            "If the topic is unrelated to food, cooking, workouts, or weight, refuse and say you can only help with nutrition and fitness questions. " +
+            "When helpful, suggest using app features like food log, meal plan, daily summary, workout log, weight log, or water log. " +
             "Answer in Vietnamese only, clearly and briefly in plain text. " +
             "Avoid markdown, bullet lists, and long explanations. " +
             "If the question is short, reply in 1-3 sentences. " +
             "Do not provide definitive medical diagnosis and advise professional care for serious issues.";
 
-    private static final int MAX_SHORT_ANSWER_CHARS = 600;
-    private static final int MAX_LONG_ANSWER_CHARS = 1200;
-    private static final int MAX_DATA_CONTEXT_CHARS = 1200;
+    private static final int MAX_SHORT_ANSWER_CHARS = 1000;
+    private static final int MAX_LONG_ANSWER_CHARS = 2000;
+    private static final int MAX_DATA_CONTEXT_CHARS = 1500;
     private static final int MAX_RECENT_LOGS = 8;
     private static final int MAX_MEAL_PLANS = 2;
     private static final int MAX_FOOD_SAMPLES = 6;
+    private static final int MAX_RECENT_WORKOUTS = 6;
 
     private final UserService userService;
     private final ChatConversationRepository conversationRepository;
@@ -54,6 +63,11 @@ public class ChatbotService {
     private final UserFoodLogRepository userFoodLogRepository;
     private final MealPlanRepository mealPlanRepository;
     private final FoodRepository foodRepository;
+    private final UserHealthProfileRepository userHealthProfileRepository;
+    private final WeightLogRepository weightLogRepository;
+    private final UserWorkoutLogRepository userWorkoutLogRepository;
+    private final StepLogRepository stepLogRepository;
+    private final UserWaterLogRepository userWaterLogRepository;
 
     public ChatbotDto.SendMessageResponse sendMessage(Long userId, ChatbotDto.SendMessageRequest request) {
         if (request.getMessage() == null || request.getMessage().trim().isEmpty()) {
@@ -216,13 +230,90 @@ public class ChatbotService {
 
         List<Food> verifiedFoods = foodRepository.findByIsVerified(true);
 
+        UserHealthProfile profile = userHealthProfileRepository.findFirstByUserIdOrderByRecordedAtDesc(userId).orElse(null);
+        WeightLog latestWeight = weightLogRepository.findFirstByUserIdOrderByLoggedAtDesc(userId).orElse(null);
+        List<UserWorkoutLog> recentWorkouts = userWorkoutLogRepository.findByUserIdAndLogDateBetween(userId, fromDate, today);
+        recentWorkouts.sort(Comparator.comparing(UserWorkoutLog::getLogDate, Comparator.nullsLast(Comparator.naturalOrder())).reversed());
+        Integer stepsToday = stepLogRepository.sumStepsByUserIdAndLogDate(userId, today);
+        Integer waterToday = userWaterLogRepository.sumWaterByUserIdAndLogDate(userId, today);
+        Double workoutCaloriesToday = userWorkoutLogRepository.sumCaloriesBurnedByUserIdAndLogDate(userId, today);
+        Double workoutDistanceToday = userWorkoutLogRepository.sumDistanceMetersByUserIdAndLogDate(userId, today);
+
         StringBuilder builder = new StringBuilder();
         builder.append("Du lieu nguoi dung (tom tat tu CSDL, chi dung cho chatbot). ");
+
+        if (profile != null) {
+            builder.append("Ho so suc khoe: ");
+            if (profile.getHeightCm() != null) {
+                builder.append("cao ").append(Math.round(profile.getHeightCm())).append(" cm, ");
+            }
+            if (profile.getWeightKg() != null) {
+                builder.append("can nang ").append(String.format("%.1f", profile.getWeightKg())).append(" kg, ");
+            }
+            if (profile.getGoalType() != null) {
+                builder.append("muc tieu ").append(profile.getGoalType().name()).append(", ");
+            }
+            if (profile.getDesiredWeightKg() != null) {
+                builder.append("can nang mong muon ").append(String.format("%.1f", profile.getDesiredWeightKg())).append(" kg, ");
+            }
+            if (profile.getTargetCalories() != null) {
+                builder.append("target calo ").append(Math.round(profile.getTargetCalories())).append(" kcal, ");
+            }
+        }
+
+        if (latestWeight != null && latestWeight.getLoggedAt() != null) {
+            builder.append("Can nang gan nhat: ")
+                    .append(latestWeight.getNewWeight() != null ? String.format("%.1f", latestWeight.getNewWeight()) : "")
+                    .append(" kg (")
+                    .append(latestWeight.getLoggedAt().toLocalDate())
+                    .append("). ");
+        }
 
         if (todayCalories != null && todayCalories > 0) {
             builder.append("Tong calo hom nay khoang ")
                     .append(Math.round(todayCalories))
                     .append(" kcal. ");
+        }
+
+        if (workoutCaloriesToday != null && workoutCaloriesToday > 0) {
+            builder.append("Tap luyen hom nay dot ")
+                    .append(Math.round(workoutCaloriesToday))
+                    .append(" kcal");
+            if (workoutDistanceToday != null && workoutDistanceToday > 0) {
+                builder.append(", quang duong ")
+                        .append(String.format("%.2f", workoutDistanceToday / 1000.0))
+                        .append(" km");
+            }
+            builder.append(". ");
+        }
+
+        if (stepsToday != null && stepsToday > 0) {
+            builder.append("So buoc hom nay ")
+                    .append(stepsToday)
+                    .append(". ");
+        }
+
+        if (waterToday != null && waterToday > 0) {
+            builder.append("Nuoc uong hom nay ")
+                    .append(waterToday)
+                    .append(" ml. ");
+        }
+
+        if (!recentWorkouts.isEmpty()) {
+            builder.append("Tap luyen 7 ngay gan day: ");
+            int count = 0;
+            for (UserWorkoutLog log : recentWorkouts) {
+                if (count >= MAX_RECENT_WORKOUTS) {
+                    break;
+                }
+                builder.append(log.getLogDate())
+                        .append(" ")
+                        .append(log.getActivityType() != null ? log.getActivityType().name() : "")
+                        .append(" ")
+                        .append(log.getDurationMin() != null ? log.getDurationMin() : 0)
+                        .append(" phut, ");
+                count++;
+            }
         }
 
         if (!recentLogs.isEmpty()) {
