@@ -3,14 +3,17 @@ package com.example.wao_be.service;
 
 import com.example.wao_be.dto.StatisticsDto;
 import com.example.wao_be.entity.UserFoodLog;
+import com.example.wao_be.entity.UserHealthProfile;
 import com.example.wao_be.entity.WeightLog;
 import com.example.wao_be.repository.UserFoodLogRepository;
+import com.example.wao_be.repository.UserHealthProfileRepository;
 import com.example.wao_be.repository.WeightLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
@@ -26,6 +29,8 @@ public class StatisticsService {
 
     private final UserFoodLogRepository userFoodLogRepository;
     private final WeightLogRepository weightLogRepository;
+    // namthem
+    private final UserHealthProfileRepository userHealthProfileRepository;
     private final UserService userService;
 
     public StatisticsDto.DailyNutritionResponse getDailyNutrition(Long userId, LocalDate date) {
@@ -97,7 +102,8 @@ public class StatisticsService {
         LocalDateTime fromDateTime = from.atStartOfDay();
         LocalDateTime toDateTime = to.plusDays(1).atStartOfDay().minusNanos(1);
 
-        // nam them: can nang luon tra ve theo tung ngay, lay newWeight moi nhat cua ngay do
+        // nam them: can nang luon tra ve theo tung ngay, lay newWeight moi nhat cua
+        // ngay do
         Map<LocalDate, WeightAccumulator> buckets = initWeightBuckets(from, to);
         List<WeightLog> logs = weightLogRepository.findByUserIdAndLoggedAtBetweenOrderByLoggedAtAsc(
                 userId, fromDateTime, toDateTime);
@@ -137,6 +143,103 @@ public class StatisticsService {
         response.setGroupBy(StatisticsDto.GroupBy.DAY);
         response.setOverallChange(firstWeight != null && lastWeight != null ? lastWeight - firstWeight : null);
         response.setPoints(points);
+        return response;
+    }
+
+    //namthem
+    public StatisticsDto.LatestWeightInfoResponse getLatestWeightInfo(Long userId) {
+        userService.findById(userId);
+        UserHealthProfile latestProfile = userHealthProfileRepository
+                .findFirstByUserIdOrderByRecordedAtDesc(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Health profile not found for user: " + userId));
+
+        LatestKnownWeightInfo latestKnown = resolveLatestKnownWeightInfo(userId, latestProfile);
+
+        StatisticsDto.LatestWeightInfoResponse response = new StatisticsDto.LatestWeightInfoResponse();
+        response.setUserId(userId);
+        response.setLatestKnownWeight(latestKnown.weight());
+        response.setLatestKnownDate(latestKnown.date());
+        response.setSource(latestKnown.source());
+        return response;
+    }
+
+    // namthem
+    @Transactional
+    public StatisticsDto.WeightLogUpdateResponse createWeightLog(
+            Long userId,
+            StatisticsDto.CreateWeightLogRequest request) {
+        System.out.println("nhận req: " + request);
+        if (request == null || request.getDate() == null || request.getNewWeight() == null) {
+            throw new IllegalArgumentException("date and newWeight are required");
+        }
+        if (request.getNewWeight() <= 0) {
+            throw new IllegalArgumentException("newWeight must be greater than 0");
+        }
+        //namthem
+        if (!LocalDate.now().equals(request.getDate())) {
+            throw new IllegalArgumentException("Chỉ được cập nhật cân nặng cho ngày hiện tại.");
+        }
+
+        var user = userService.findById(userId);
+        UserHealthProfile latestProfile = userHealthProfileRepository
+                .findFirstByUserIdOrderByRecordedAtDesc(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Health profile not found for user: " + userId));
+
+        LatestKnownWeightInfo latestKnown = resolveLatestKnownWeightInfo(userId, latestProfile);
+        validateWeightThreshold(request.getNewWeight(), latestKnown);
+
+        LocalDateTime loggedAt = request.getDate().atStartOfDay();
+        //namthem
+        if (weightLogRepository.existsByUserIdAndLoggedAtBetween(
+                userId,
+                loggedAt,
+                request.getDate().plusDays(1).atStartOfDay().minusNanos(1))) {
+            throw new IllegalArgumentException("Hôm nay đã có bản ghi cân nặng rồi, không thể thêm lần nữa.");
+        }
+        Double oldWeight = weightLogRepository
+                .findFirstByUserIdAndLoggedAtLessThanEqualOrderByLoggedAtDesc(userId, loggedAt)
+                .map(WeightLog::getNewWeight)
+                .orElse(latestProfile.getWeightKg());
+
+        if (oldWeight == null) {
+            oldWeight = request.getNewWeight();
+        }
+
+        WeightLog weightLog = WeightLog.builder()
+                .user(user)
+                .oldWeight(oldWeight)
+                .newWeight(request.getNewWeight())
+                .note(request.getNote())
+                .loggedAt(loggedAt)
+                .build();
+
+        WeightLog savedWeightLog = weightLogRepository.save(weightLog);
+
+        try {
+            //namthem
+            latestProfile.setWeightKg(request.getNewWeight());
+            userHealthProfileRepository.save(latestProfile);
+        } catch (IllegalArgumentException ex) {
+            //namthem
+            throw new IllegalArgumentException(
+                    "Da ghi log can nang, nhung khong dong bo duoc ho so suc khoe: " + ex.getMessage(), ex);
+        } catch (Exception ex) {
+            //namthem
+            throw new IllegalArgumentException(
+                    "Da ghi log can nang, nhung cap nhat ho so suc khoe that bai. Vui long kiem tra muc tieu can nang hien tai.", ex);
+        }
+
+        StatisticsDto.WeightLogUpdateResponse response = new StatisticsDto.WeightLogUpdateResponse();
+        response.setLogId(savedWeightLog.getId());
+        response.setUserId(userId);
+        response.setDate(request.getDate());
+        response.setOldWeight(savedWeightLog.getOldWeight());
+        response.setNewWeight(savedWeightLog.getNewWeight());
+        response.setChangeAmount(savedWeightLog.getChangeAmount());
+        response.setCurrentProfileWeight(latestProfile.getWeightKg());
+        response.setNote(savedWeightLog.getNote());
+        response.setLatestKnownWeight(latestKnown.weight());
+        response.setLatestKnownDate(latestKnown.date());
         return response;
     }
 
@@ -196,6 +299,66 @@ public class StatisticsService {
 
     private double safe(Double value) {
         return value != null ? value : 0.0;
+    }
+
+    //namthem
+    private LatestKnownWeightInfo resolveLatestKnownWeightInfo(Long userId, UserHealthProfile latestProfile) {
+        return weightLogRepository.findFirstByUserIdOrderByLoggedAtDesc(userId)
+                .map(log -> new LatestKnownWeightInfo(
+                        log.getNewWeight(),
+                        log.getLoggedAt() != null ? log.getLoggedAt().toLocalDate() : null,
+                        "WEIGHT_LOG"))
+                .orElseGet(() -> new LatestKnownWeightInfo(
+                        latestProfile.getWeightKg(),
+                        latestProfile.getRecordedAt() != null ? latestProfile.getRecordedAt().toLocalDate() : null,
+                        "HEALTH_PROFILE"));
+    }
+
+    //namthem
+    private void validateWeightThreshold(Double newWeight, LatestKnownWeightInfo latestKnown) {
+        if (newWeight == null || latestKnown.weight() == null) {
+            return;
+        }
+
+        double delta = Math.abs(newWeight - latestKnown.weight());
+        double allowedDelta = resolveAllowedWeightDelta(latestKnown.date());
+
+        if (delta > allowedDelta) {
+            String latestDateText = latestKnown.date() != null ? latestKnown.date().toString() : "khong ro ngay";
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Can nang gan nhat la %.1f kg vao ngay %s. Muc nhap moi %.1f kg vuot nguong cho phep %.1f kg, vui long kiem tra lai.",
+                            latestKnown.weight(),
+                            latestDateText,
+                            newWeight,
+                            allowedDelta));
+        }
+    }
+
+    //namthem
+    private double resolveAllowedWeightDelta(LocalDate latestKnownDate) {
+        if (latestKnownDate == null) {
+            return 8.0;
+        }
+
+        long daysSinceLastLog = Math.max(0, Duration.between(latestKnownDate.atStartOfDay(), LocalDate.now().atStartOfDay()).toDays());
+        if (daysSinceLastLog <= 30) {
+            return 5.0;
+        }
+        if (daysSinceLastLog <= 90) {
+            return 8.0;
+        }
+        if (daysSinceLastLog <= 180) {
+            return 12.0;
+        }
+        return 18.0;
+    }
+
+    //namthem
+    private record LatestKnownWeightInfo(
+            Double weight,
+            LocalDate date,
+            String source) {
     }
 
     private class NutritionAccumulator {

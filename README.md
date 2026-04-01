@@ -210,8 +210,36 @@ server.port=8080
 | Step Log | `/api/step-logs` |
 | Water Log | `/api/water-logs` |
 | Daily Summary | `/api/daily-summaries` |
+| Chatbot AI | `/api/users/{userId}/chat/*` |
 
 > 📌 Tất cả API đều hỗ trợ các phương thức: `GET`, `POST`, `PUT`, `DELETE`
+
+### Chatbot AI (OpenRouter)
+
+- Tạo conversation: `POST /api/users/{userId}/chat/conversations`
+- Gửi tin nhắn: `POST /api/users/{userId}/chat/messages`
+- Lấy danh sách conversation: `GET /api/users/{userId}/chat/conversations`
+- Lấy chi tiết message: `GET /api/users/{userId}/chat/conversations/{conversationId}`
+- Xóa conversation: `DELETE /api/users/{userId}/chat/conversations/{conversationId}`
+
+Ví dụ request gửi tin nhắn:
+
+```json
+{
+  "conversationId": 1,
+  "message": "Hom nay toi nen an gi de giam can?",
+  "model": "openai/gpt-4o-mini",
+  "temperature": 0.7,
+  "maxTokens": 400
+}
+```
+
+Để chạy chatbot, cần set biến môi trường API key trước khi start server:
+
+```powershell
+$env:OPENROUTER_API_KEY="your_openrouter_key"
+.\mvnw.cmd spring-boot:run
+```
 
 ### Food form + image upload
 
