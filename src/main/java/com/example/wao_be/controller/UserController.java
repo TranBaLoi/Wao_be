@@ -66,12 +66,22 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    /** POST /api/users/upload-avatar
+     * Phía BE nhận ảnh, push lên Cloudinary và trả về img_url để Frontend có thể tiếp tục xử lý lưu (ví dụ PUT update user profile)
+     */
+    @PostMapping(value = "/upload-avatar", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<java.util.Map<String, String>> uploadAvatarOnly(@RequestParam("file") MultipartFile file) throws Exception {
+        String avatarUrl = imageStorageService.uploadAvatar(file);
+        return ResponseEntity.ok(java.util.Map.of("imgUrl", avatarUrl));
+    }
+
     /** POST /api/users/{id}/avatar */
-    @PostMapping("/{id}/avatar")
-    public ResponseEntity<UserDto.Response> uploadAvatar(@PathVariable Long id,
+    @PostMapping(value = "/{id}/avatar", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<java.util.Map<String, String>> uploadAvatar(@PathVariable Long id,
                                                          @RequestParam("file") MultipartFile file) throws Exception {
         String avatarUrl = imageStorageService.uploadAvatar(file);
-        return ResponseEntity.ok(userService.updateAvatarUrl(id, avatarUrl));
+        userService.updateAvatarUrl(id, avatarUrl);
+        return ResponseEntity.ok(java.util.Map.of("imgUrl", avatarUrl));
     }
 
     /** DELETE /api/users/{id} */
