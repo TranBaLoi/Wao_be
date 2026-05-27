@@ -1,3 +1,7 @@
+/*
+ * Bài làm của Nguyễn Hải Nam-B22DCCN558
+ * Entity lưu từng lần cập nhật cân nặng của người dùng.
+ */
 package com.example.wao_be.entity;
 
 import jakarta.persistence.*;
@@ -5,6 +9,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * Ánh xạ bảng weight_logs, dùng để theo dõi lịch sử thay đổi cân nặng theo thời gian.
+ */
 @Entity
 @Table(name = "weight_logs")
 @Getter
@@ -44,6 +51,9 @@ public class WeightLog {
     @Column(name = "logged_at", updatable = false)
     private LocalDateTime loggedAt;
 
+    /**
+     * Tự điền thời điểm log nếu thiếu và tính chênh lệch giữa cân nặng mới với cân nặng cũ.
+     */
     @PrePersist
     public void calculateChange() {
         //namthem

@@ -1,3 +1,7 @@
+/*
+ * Bài làm của Nguyễn Hải Nam-B22DCCN558
+ * Service xử lý nghiệp vụ thống kê dinh dưỡng, biểu đồ xu hướng và ghi log cân nặng.
+ */
 // phan cua nam
 package com.example.wao_be.service;
 
@@ -22,6 +26,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Lớp nghiệp vụ chính của module thống kê. Các API đọc dữ liệu chạy readOnly, riêng tạo log cân nặng dùng transaction ghi.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -33,12 +40,16 @@ public class StatisticsService {
     private final UserHealthProfileRepository userHealthProfileRepository;
     private final UserService userService;
 
+    /**
+     * Tổng hợp toàn bộ calories và macros của user trong một ngày.
+     */
     // tổng hợp toàn bộ dinh dưỡng trong 1 ngày
     public StatisticsDto.DailyNutritionResponse getDailyNutrition(Long userId, LocalDate date) {
         userService.findById(userId);
 
         NutritionAccumulator accumulator = new NutritionAccumulator();
         // add tất cả log lại vào accymulator
+        // Mỗi log được cộng vào accumulator để gom calories/protein/carbs/fat thành một response duy nhất.
         userFoodLogRepository.findByUserIdAndLogDate(userId, date)
                 .forEach(accumulator::add);
 
@@ -52,6 +63,9 @@ public class StatisticsService {
         return response;
     }
 
+    /**
+     * Tạo chuỗi dữ liệu dinh dưỡng theo khoảng ngày, có thể gom theo ngày/tuần/tháng để vẽ biểu đồ.
+     */
     // thốn kê dinh dưỡng cho nhiều ngày, có thể group theo ngày, tuần, tháng
     public StatisticsDto.NutritionSeriesResponse getNutritionSeries(
             Long userId,
@@ -94,6 +108,9 @@ public class StatisticsService {
         return response;
     }
 
+    /**
+     * Khởi tạo sẵn các bucket thời gian để ngày/tuần/tháng không có dữ liệu vẫn trả về điểm 0 cho biểu đồ.
+     */
     private Map<LocalDate, NutritionAccumulator> initNutritionBuckets(
             LocalDate from,
             LocalDate to,
@@ -109,6 +126,7 @@ public class StatisticsService {
         return buckets;
     }
 
+    /** Chuẩn hóa ngày log về khóa bucket tương ứng với kiểu groupBy. */
     private LocalDate bucketDate(LocalDate date, StatisticsDto.GroupBy groupBy) {
         return switch (groupBy) {
             case DAY -> date;
@@ -117,6 +135,7 @@ public class StatisticsService {
         };
     }
 
+    /** Tính bucket kế tiếp để vòng lặp sinh đủ chuỗi thời gian. */
     private LocalDate nextBucket(LocalDate bucketDate, StatisticsDto.GroupBy groupBy) {
         return switch (groupBy) {
             case DAY -> bucketDate.plusDays(1);
@@ -125,6 +144,9 @@ public class StatisticsService {
         };
     }
 
+    /**
+     * Helper cộng dồn calories và macros, tránh lặp logic tổng hợp ở daily và series.
+     */
     // cộng dinh dưỡng từng món ăn 1
     private class NutritionAccumulator {
         private double totalCalories;
@@ -148,6 +170,9 @@ public class StatisticsService {
         }
     }
 
+    /**
+     * Lấy chuỗi cân nặng theo từng ngày trong khoảng from-to, phục vụ biểu đồ xu hướng cân nặng.
+     */
     public StatisticsDto.WeightSeriesResponse getWeightSeries(
             Long userId,
             LocalDate from,
@@ -207,6 +232,9 @@ public class StatisticsService {
         return response;
     }
 
+    /**
+     * Lấy cân nặng gần nhất: ưu tiên weight log mới nhất, nếu chưa có log thì dùng cân nặng trong health profile.
+     */
     // thêm phần này để lấy cân nặng gần nhất của user, có thể là từ health profile
     // hoặc log
     public StatisticsDto.LatestWeightInfoResponse getLatestWeightInfo(Long userId) {
@@ -225,6 +253,7 @@ public class StatisticsService {
         return response;
     }
 
+    /** Cấu trúc nội bộ lưu cân nặng gần nhất, ngày tương ứng và nguồn dữ liệu. */
     // tính cân nặng gần nhất
     private record LatestKnownWeightInfo(
             Double weight,
@@ -233,6 +262,9 @@ public class StatisticsService {
     }
 
     // namthem
+    /**
+     * Tạo log cân nặng cho ngày hiện tại, kiểm tra dữ liệu nhập, chống log trùng ngày và đồng bộ về health profile.
+     */
     @Transactional
     public StatisticsDto.WeightLogUpdateResponse createWeightLog(
             Long userId,
@@ -245,6 +277,7 @@ public class StatisticsService {
             throw new IllegalArgumentException("newWeight must be greater than 0");
         }
         // namthem
+        // Chỉ cho ghi log ngày hiện tại để dữ liệu biểu đồ và hồ sơ sức khỏe không bị sửa lùi ngày.
         if (!LocalDate.now().equals(request.getDate())) {
             throw new IllegalArgumentException("Chỉ được cập nhật cân nặng cho ngày hiện tại.");
         }
@@ -259,6 +292,7 @@ public class StatisticsService {
 
         LocalDateTime loggedAt = request.getDate().atStartOfDay();
         // namthem
+        // Mỗi ngày chỉ có một bản ghi cân nặng để tránh biểu đồ bị nhiễu dữ liệu nhập nhiều lần.
         if (weightLogRepository.existsByUserIdAndLoggedAtBetween(
                 userId,
                 loggedAt,
@@ -286,6 +320,7 @@ public class StatisticsService {
 
         try {
             // namthem
+            // Đồng bộ cân nặng mới nhất về health profile để các màn hình khác đọc được giá trị hiện tại.
             latestProfile.setWeightKg(request.getNewWeight());
             userHealthProfileRepository.save(latestProfile);
         } catch (IllegalArgumentException ex) {
@@ -313,6 +348,7 @@ public class StatisticsService {
         return response;
     }
 
+    /** Khởi tạo bucket cân nặng theo từng ngày trong khoảng được chọn. */
     private Map<LocalDate, WeightAccumulator> initWeightBuckets(
             LocalDate from,
             LocalDate to) {
@@ -327,6 +363,7 @@ public class StatisticsService {
         return buckets;
     }
 
+    /** Kiểm tra khoảng ngày bắt buộc có from/to và from không được sau to. */
     private void validateRange(LocalDate from, LocalDate to) {
         if (from == null || to == null) {
             throw new IllegalArgumentException("from and to are required");
@@ -336,11 +373,15 @@ public class StatisticsService {
         }
     }
 
+    /** Đổi giá trị null thành 0 để quá trình cộng dồn không bị NullPointerException. */
     private double safe(Double value) {
         return value != null ? value : 0.0;
     }
 
     // namthem
+    /**
+     * Xác định nguồn cân nặng gần nhất: weight_logs nếu đã từng log, ngược lại dùng health profile.
+     */
     private LatestKnownWeightInfo resolveLatestKnownWeightInfo(Long userId, UserHealthProfile latestProfile) {
         return weightLogRepository.findFirstByUserIdOrderByLoggedAtDesc(userId)
                 .map(log -> new LatestKnownWeightInfo(
@@ -354,6 +395,9 @@ public class StatisticsService {
     }
 
     // namthem
+    /**
+     * Chặn các giá trị cân nặng nhập lệch quá lớn so với dữ liệu gần nhất để tránh nhập nhầm.
+     */
     private void validateWeightThreshold(Double newWeight, LatestKnownWeightInfo latestKnown) {
         if (newWeight == null || latestKnown.weight() == null) {
             return;
@@ -374,6 +418,9 @@ public class StatisticsService {
         }
     }
 
+    /**
+     * Tính ngưỡng chênh lệch cân nặng cho phép. Càng lâu chưa log thì ngưỡng được nới rộng hơn.
+     */
     // thêm ngưỡng
     private double resolveAllowedWeightDelta(LocalDate latestKnownDate) {
         if (latestKnownDate == null) {
@@ -394,6 +441,9 @@ public class StatisticsService {
         return 18.0;
     }
 
+    /**
+     * Helper gom các log trong cùng một ngày để lấy cân nặng đầu ngày, cuối ngày và số lần log.
+     */
     // tính sự chênh lệnh cân nặng theo ngày, có thể có nhiều log trong ngày, lấy
     // log đầu tiên làm startWeight, log cuối cùng làm endWeight
     private static class WeightAccumulator {
